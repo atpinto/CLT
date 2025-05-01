@@ -3,172 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLT Simulation - Refactored</title>
+    <title>CLT Simulation - Formatted</title>
     <style>
         /* CSS Styles (Same as previous - Compact version) */
-        body { font-family: sans-serif; line-height: 1.3; padding: 5px; background-color: #f4f4f4; color: #333; display: flex; flex-direction: column; align-items: center; font-size: 14px; }
-        h1 { font-size: 1.2em; margin-bottom: 6px; text-align: center; width: 100%;}
-        h2 { font-size: 0.95em; margin-bottom: 4px; text-align: left; width: 100%; }
-        h3 { font-size: 0.85em; margin-bottom: 4px; margin-top: 8px; text-align: left; width: 100%; }
-        .main-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 520px; gap: 6px; }
-         .reset-container { width: 100%; max-width: 520px; text-align: right; margin-bottom: 8px; box-sizing: border-box; padding-right: 5px; }
-        .reset-button { padding: 4px 10px; font-size: 0.85em; cursor: pointer; background-color: #dc3545; color: white; border: none; border-radius: 4px; transition: background-color 0.2s ease; }
+        :root { /* Define color palette */
+            --primary-color: #007bff; --secondary-color: #6c757d; --success-color: #28a745; --warning-color: #fd7e14; --danger-color: #dc3545; --highlight-color: #6f42c1; --normal-curve-color: #17a2b8; --light-bg: #f8f9fa; --dark-text: #343a40; --medium-text: #6c757d; --border-color: #dee2e6; --canvas-bg: #ffffff; --pop-line-color: var(--primary-color); --pop-fill-color: rgba(0, 123, 255, 0.15); --sample-bar-fill: var(--success-color); --sample-bar-stroke: #1c7430; --sampling-bar-fill: var(--success-color); --sampling-bar-stroke: #1c7430; --anim-marker-color: rgba(40, 167, 69, 0.8);
+        }
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.3; padding: 1px; background-color: var(--light-bg); color: var(--dark-text); display: flex; flex-direction: column; align-items: center; font-size: 13px; }
+        h1 { font-size: 1.1em; margin-bottom: 1px; text-align: center; width: 100%; color: var(--dark-text); font-weight: 600;}
+        h2 { font-size: 0.9em; margin-bottom: 1px; text-align: left; width: 100%; font-weight: 600; color: var(--dark-text); border-bottom: 1px solid var(--border-color); padding-bottom: 3px;}
+        h3 { font-size: 0.8em; margin-bottom: 3px; margin-top: 1px; text-align: left; width: 100%; font-weight: 600; color: var(--dark-text);}
+        .main-container { display: flex; flex-direction: column; align-items: stretch; width: 100%; max-width: 480px; gap: 1px; }
+        .simulation-section { background-color: var(--canvas-bg); padding: 6px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); border: 1px solid var(--border-color); margin-bottom: 10px; }
+         .reset-container { width: 100%; max-width: 480px; text-align: right; margin-bottom: 6px; box-sizing: border-box; padding-right: 0; }
+        .reset-button { padding: 3px 8px; font-size: 0.9em; cursor: pointer; background-color: var(--danger-color); color: white; border: none; border-radius: 3px; transition: background-color 0.2s ease; }
         .reset-button:hover { background-color: #c82333; }
         .reset-button:disabled { background-color: #ccc; cursor: not-allowed; }
-        .controls { background-color: #fff; padding: 4px 8px; border-radius: 3px; border: 1px solid #ddd; box-shadow: 0 1px 1px rgba(0,0,0,0.06); text-align: left; margin-bottom: 6px; width: 100%; box-sizing: border-box; font-size: 0.85em; }
-        .controls label { margin: 0 5px 0 2px; cursor: pointer; display: inline-block; }
-        .controls input[type="radio"] { margin-right: 2px; cursor: pointer; vertical-align: middle; transform: scale(0.9); }
-        .controls span { font-weight: bold; margin-right: 5px; }
-        .controls button { padding: 2px 6px; font-size: 0.95em; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 3px; margin-left: 8px; transition: background-color 0.2s ease; float: right; }
-        .controls button:disabled { background-color: #ccc; cursor: not-allowed; }
-        .controls button:hover:not(:disabled) { background-color: #218838; }
-        .controls .stat-select label { margin-left: 10px;}
-        .content-area { display: flex; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 8px; width: 100%; margin-bottom: 6px; }
-        .canvas-container { position: relative; flex-shrink: 0; }
-        .population-canvas, .sample-canvas, .sampling-dist-canvas { border: 1px solid #ccc; background-color: #fff; width: 280px; height: 140px; }
+        .controls { background-color: #ffffff; padding: 3px 6px; border-radius: 3px; border: 1px solid #dee2e6; box-shadow: 0 1px 1px rgba(0,0,0,0.06); text-align: left; margin-bottom: 6px; width: 100%; box-sizing: border-box; font-size: 0.85em; }
+        #sampleControls, #samplingDistControls { background-color: transparent; border: none; box-shadow: none; padding: 4px 0; margin-bottom: 5px; }
+        .controls label { margin: 0 4px 0 1px; cursor: pointer; display: inline-flex; align-items: center; white-space: nowrap; }
+        .controls input[type="radio"], .controls input[type="checkbox"] { margin-right: 3px; cursor: pointer; vertical-align: middle; transform: scale(0.85); margin-top: -1px; }
+        .controls > span:first-of-type { font-weight: 600; margin-right: 4px; flex-shrink: 0;}
+        .control-group { margin-bottom: 5px; }
+        .button-group { margin-top: 5px; text-align: left; }
+        #sampleControls .button-group button { padding: 1px 5px; font-size: 0.9em; cursor: pointer; background-color: var(--success-color); color: white; border: none; border-radius: 3px; margin-right: 6px; margin-left: 0; transition: background-color 0.2s ease; }
+        #sampleControls .button-group button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #sampleControls .button-group button:hover:not(:disabled) { background-color: #218838; }
+        .controls .checkbox-label { margin-left: 15px; }
+        .content-area { display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px; width: 100%; }
+        .canvas-container { position: relative; flex-grow: 1; min-width: 0; display: flex; justify-content: center; max-width: 250px;}
+        .population-canvas, .sample-canvas, .sampling-dist-canvas { border: 1px solid var(--border-color); background-color: var(--canvas-bg); width: 100%; height: 125px; box-shadow: 0 1px 2px rgba(0,0,0,0.05) inset; display: block; max-width: none; }
         .population-canvas { cursor: crosshair; }
         .sample-canvas, .sampling-dist-canvas { cursor: default; }
-        .stats-display { border: 1px solid #ddd; padding: 4px 8px; background-color: #fff; border-radius: 3px; min-width: 125px; box-shadow: 0 1px 1px rgba(0,0,0,0.06); flex-shrink: 0; font-size: 0.7em; }
-        .stats-display h2 { margin-top: 0; font-size: 1.1em; border-bottom: 1px solid #eee; padding-bottom: 2px; margin-bottom: 4px; }
-        .stats-display p { margin: 2px 0; clear: both; }
-        .stats-display span { font-weight: bold; color: #0056b3; float: right; min-width: 25px; text-align: right; }
-        .stats-display .count { font-weight: normal; color: #333; }
-        p.instructions { text-align: left; margin: 1px 0 4px 0; color: #555; font-style: italic; font-size: 0.75em; width: 100%; }
-        @media (max-width: 550px) { body { font-size: 13px; } .main-container { max-width: 96%; gap: 5px;} .reset-container { padding-right: 0; margin-bottom: 6px; } .content-area { flex-wrap: wrap; gap: 6px;} .population-canvas, .sample-canvas, .sampling-dist-canvas { width: 100%; max-width: 350px; height: auto; aspect-ratio: 2 / 1; } .stats-display { width: 100%; max-width: 350px; margin-top: 4px; } .controls { width: 100%; font-size: 0.8em;} h1 { font-size: 1.1em; } h2 { font-size: 0.9em; } h3 { font-size: 0.8em; } .controls button { margin-left: 5px; padding: 2px 5px;} .controls .stat-select label { margin-left: 5px;} .reset-button { font-size: 0.8em; padding: 3px 8px; } }
+        .stats-display { border: 1px solid var(--border-color); padding: 4px 8px; background-color: #fdfdfd; border-radius: 4px; width: 130px; min-width: 115px; box-shadow: none; flex-shrink: 0; font-size: 0.75em; align-self: stretch; }
+        .stats-display h2 { margin-top: 0; font-size: 1.05em; border-bottom: 1px solid #eee; padding-bottom: 2px; margin-bottom: 4px; font-weight: 600;}
+        .stats-display p { margin: 1px 0; clear: both; display: flex; justify-content: space-between; }
+        .stats-display span { font-weight: bold; color: var(--primary-color); text-align: right; }
+        .stats-display .count { font-weight: bold; color: var(--dark-text); }
+        p.instructions { text-align: left; margin: 0 0 6px 0; color: var(--medium-text); font-style: italic; font-size: 0.8em; width: 100%; }
+        @media (max-width: 500px) { body { font-size: 12px; } .main-container { max-width: 97%; gap: 8px;} .reset-container { padding-right: 0; margin-bottom: 6px; } .simulation-section { padding: 10px;} .content-area { flex-wrap: wrap; gap: 8px;} .canvas-container { width: 100%; max-width: none; margin-bottom: 8px; flex-grow: 0;} .population-canvas, .sample-canvas, .sampling-dist-canvas { width: 100%; max-width: none; height: auto; aspect-ratio: 2 / 1; } .stats-display { width: 100%; max-width: none; min-width: 0; margin-top: 5px; align-self: auto; width: auto;} .controls { font-size: 0.9em; padding: 4px 0;} #presetControls { background-color: #ffffff; padding: 3px 6px; border-radius: 3px; border: 1px solid #dee2e6; box-shadow: 0 1px 1px rgba(0,0,0,0.06); } h1 { font-size: 1.1em; } h2 { font-size: 0.9em; } h3 { font-size: 0.85em; } .button-group { margin-top: 6px; text-align: center;} #sampleControls .button-group button { margin-right: 4px; padding: 2px 5px;} .controls label { margin-right: 2px;} .controls .checkbox-label { margin-left: 10px; } .reset-button { font-size: 0.9em; padding: 3px 8px; } }
     </style>
 </head>
 <body>
-    <!-- HTML Content (Unchanged) -->
+    <!-- HTML Content -->
     <h1>Central Limit Theorem Simulation</h1>
      <div class="reset-container">
         <button id="resetBtn" class="reset-button">Reset Simulation</button>
     </div>
     <div class="main-container">
-        <!-- Population Section -->
-        <h2>Population</h2>
-        <p class="instructions">Define population shape via presets or by clicking/dragging on the plot.</p>
-        <div class="controls" id="presetControls">
-             <span>Load Preset:</span>
-             <input type="radio" id="presetNormal" name="distType" value="normal" checked> <label for="presetNormal">Normal</label>
-             <input type="radio" id="presetUniform" name="distType" value="uniform"> <label for="presetUniform">Uniform</label>
-             <input type="radio" id="presetExponential" name="distType" value="exponential"> <label for="presetExponential">Exponential</label>
-             <input type="radio" id="presetBimodal" name="distType" value="bimodal"> <label for="presetBimodal">Bimodal</label>
-        </div>
-        <div class="content-area">
-            <div class="canvas-container">
-                <canvas id="populationCanvas" class="population-canvas" width="280" height="140"></canvas>
+        <section class="simulation-section population-section">
+            <h2>Population</h2>
+            <p class="instructions">Define population shape via presets or by clicking/dragging on the plot.</p>
+            <div class="controls" id="presetControls">
+                 <span>Load Preset:</span>
+                 <input type="radio" id="presetNormal" name="distType" value="normal" checked> <label for="presetNormal">Normal</label>
+                 <input type="radio" id="presetUniform" name="distType" value="uniform"> <label for="presetUniform">Uniform</label>
+                 <input type="radio" id="presetExponential" name="distType" value="exponential"> <label for="presetExponential">Exponential</label>
+                 <input type="radio" id="presetBimodal" name="distType" value="bimodal"> <label for="presetBimodal">Bimodal</label>
             </div>
-            <div id="populationStatsDisplay" class="stats-display">
-                <h2>Population Stats</h2>
-                <p>Mean: <span id="popMeanVal">-</span></p>
-                <p>Median: <span id="popMedianVal">-</span></p>
-                <p>Std Dev: <span id="popStdDevVal">-</span></p>
+            <div class="content-area" id="population-area">
+                <div class="canvas-container" id="population-canvas-container">
+                    <canvas id="populationCanvas" class="population-canvas" width="250" height="125"></canvas>
+                </div>
+                <div id="populationStatsDisplay" class="stats-display">
+                    <h2>Population Stats</h2>
+                    <p>Mean: <span id="popMeanVal">-</span></p>
+                    <p>Median: <span id="popMedianVal">-</span></p>
+                    <p>Std Dev: <span id="popStdDevVal">-</span></p>
+                </div>
             </div>
-        </div>
-        <!-- Sample Section -->
-        <h3>Sample (n=<span id="nValDisplay">5</span>) Distribution</h3>
-        <p class="instructions">A single sample drawn from the population above. Highlight shows calculated statistic.</p>
-        <div class="controls" id="sampleControls">
-             <span>Sample Size (n):</span>
-             <input type="radio" id="n5" name="sampleSize" value="5" checked> <label for="n5">5</label>
-             <input type="radio" id="n10" name="sampleSize" value="10"> <label for="n10">10</label>
-             <input type="radio" id="n20" name="sampleSize" value="20"> <label for="n20">20</label>
-             <input type="radio" id="n100" name="sampleSize" value="100"> <label for="n100">100</label>
-             <button id="drawSampleBtn">Draw 1 Sample</button>
-             <button id="draw100SamplesBtn" style="margin-left: 8px;">Draw 100 Samples</button>
-        </div>
-        <div class="content-area">
-             <div class="canvas-container">
-                <canvas id="sampleCanvas" class="sample-canvas" width="280" height="140"></canvas>
+        </section>
+        <section class="simulation-section sample-section">
+            <h3>Sample Distribution (n=<span id="nValDisplay">5</span>)</h3>
+            <p class="instructions">A single sample drawn from the population above. Highlight shows calculated statistic.</p>
+            <div class="controls" id="sampleControls">
+                <div class="control-group">
+                     <span>Sample Size (n):</span>
+                     <input type="radio" id="n5" name="sampleSize" value="5" checked> <label for="n5">5</label>
+                     <input type="radio" id="n10" name="sampleSize" value="10"> <label for="n10">10</label>
+                     <input type="radio" id="n20" name="sampleSize" value="20"> <label for="n20">20</label>
+                     <input type="radio" id="n100" name="sampleSize" value="100"> <label for="n100">100</label>
+                </div>
+                <div class="button-group">
+                     <button id="drawSampleBtn">Draw 1 Sample</button>
+                     <button id="draw100SamplesBtn">Draw 100 Samples</button>
+                     <button id="draw1000SamplesBtn">Draw 1000 Samples</button>
+                 </div>
             </div>
-            <div id="sampleStatsDisplay" class="stats-display">
-                <h2>Sample Stats</h2>
-                <p>Mean: <span id="sampleMeanVal">-</span></p>
-                <p>Median: <span id="sampleMedianVal">-</span></p>
-                <p>Std Dev: <span id="sampleStdDevVal">-</span></p>
-                <p>Size (n): <span id="sampleNVal">-</span></p>
+            <div class="content-area">
+                 <div class="canvas-container">
+                    <canvas id="sampleCanvas" class="sample-canvas" width="250" height="125"></canvas>
+                </div>
+                <div id="sampleStatsDisplay" class="stats-display">
+                    <h2>Sample Stats</h2>
+                    <p>Mean: <span id="sampleMeanVal">-</span></p>
+                    <p>Median: <span id="sampleMedianVal">-</span></p>
+                    <p>Std Dev: <span id="sampleStdDevVal">-</span></p>
+                    <p>Size (n): <span id="sampleNVal">-</span></p>
+                </div>
             </div>
-        </div>
-         <!-- Sampling Distribution Section -->
-        <h3>Sampling Distribution</h3>
-         <p class="instructions">Distribution of statistics calculated from multiple samples.</p>
-        <div class="controls" id="samplingDistControls">
-             <span>Plot Statistic:</span>
-             <span class="stat-select">
-                 <input type="radio" id="statMean" name="samplingStat" value="mean" checked> <label for="statMean">Mean</label>
-                 <input type="radio" id="statMedian" name="samplingStat" value="median"> <label for="statMedian">Median</label>
-                 <input type="radio" id="statStdDev" name="samplingStat" value="stdDev"> <label for="statStdDev">Std Dev</label>
-             </span>
-        </div>
-        <div class="content-area">
-            <div class="canvas-container">
-                <canvas id="samplingDistCanvas" class="sampling-dist-canvas" width="280" height="140"></canvas>
+        </section>
+         <section class="simulation-section sampling-dist-section">
+             <h3>Sampling <span id="samplingDistStatName">Mean</span> Distribution</h3>
+             <p class="instructions">Distribution of statistics calculated from multiple samples.</p>
+            <div class="controls" id="samplingDistControls">
+                 <span>Plot Statistic:</span>
+                 <span class="stat-select">
+                     <input type="radio" id="statMean" name="samplingStat" value="mean" checked> <label for="statMean">Mean</label>
+                     <input type="radio" id="statMedian" name="samplingStat" value="median"> <label for="statMedian">Median</label>
+                     <input type="radio" id="statStdDev" name="samplingStat" value="stdDev"> <label for="statStdDev">Std Dev</label>
+                 </span>
+                 <label class="checkbox-label"><input type="checkbox" id="showNormalCurve"> Show Normal Curve</label>
             </div>
-            <div id="samplingDistStatsDisplay" class="stats-display">
-                <h2>Distribution Stats</h2>
-                <p>Samples Drawn: <span id="samplesDrawnVal" class="count">0</span></p>
-                <p>Mean: <span id="samplingMeanVal">-</span></p>
-                <p>Median: <span id="samplingMedianVal">-</span></p>
-                <p>Std Dev: <span id="samplingStdDevVal">-</span></p>
+            <div class="content-area">
+                <div class="canvas-container">
+                    <canvas id="samplingDistCanvas" class="sampling-dist-canvas" width="250" height="125"></canvas>
+                </div>
+                <div id="samplingDistStatsDisplay" class="stats-display">
+                    <h2>Distribution Stats</h2>
+                    <p>Samples Drawn: <span id="samplesDrawnVal" class="count">0</span></p>
+                    <p>Mean: <span id="samplingMeanVal">-</span></p>
+                    <p>Median: <span id="samplingMedianVal">-</span></p>
+                    <p>Std Error: <span id="samplingStdDevVal">-</span></p>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- Canvas and Context Setup ---
-            const popCanvas = document.getElementById('populationCanvas'); const popCtx = popCanvas.getContext('2d');
-            const sampleCanvas = document.getElementById('sampleCanvas'); const sampleCtx = sampleCanvas.getContext('2d');
-            const samplingDistCanvas = document.getElementById('samplingDistCanvas'); const samplingDistCtx = samplingDistCanvas.getContext('2d');
+            const popCanvas = document.getElementById('populationCanvas');
+            const popCtx = popCanvas.getContext('2d');
+            const sampleCanvas = document.getElementById('sampleCanvas');
+            const sampleCtx = sampleCanvas.getContext('2d');
+            const samplingDistCanvas = document.getElementById('samplingDistCanvas');
+            const samplingDistCtx = samplingDistCanvas.getContext('2d');
 
             // --- Stats Display Elements ---
-             const popStatsDisplay = {
-                 mean: document.getElementById('popMeanVal'),
-                 median: document.getElementById('popMedianVal'),
-                 stdDev: document.getElementById('popStdDevVal')
-             };
-             const sampleStatsDisplay = {
-                 mean: document.getElementById('sampleMeanVal'),
-                 median: document.getElementById('sampleMedianVal'),
-                 stdDev: document.getElementById('sampleStdDevVal'),
-                 n: document.getElementById('sampleNVal')
-             };
-             const samplingDistStatsDisplay = {
-                 count: document.getElementById('samplesDrawnVal'),
-                 mean: document.getElementById('samplingMeanVal'),
-                 median: document.getElementById('samplingMedianVal'),
-                 stdDev: document.getElementById('samplingStdDevVal')
-             };
+            const popStatsDisplay = {
+                mean: document.getElementById('popMeanVal'),
+                median: document.getElementById('popMedianVal'),
+                stdDev: document.getElementById('popStdDevVal')
+            };
+            const sampleStatsDisplay = {
+                mean: document.getElementById('sampleMeanVal'),
+                median: document.getElementById('sampleMedianVal'),
+                stdDev: document.getElementById('sampleStdDevVal'),
+                n: document.getElementById('sampleNVal')
+            };
+            const samplingDistStatsDisplay = {
+                count: document.getElementById('samplesDrawnVal'),
+                mean: document.getElementById('samplingMeanVal'),
+                median: document.getElementById('samplingMedianVal'),
+                stdDev: document.getElementById('samplingStdDevVal')
+            };
 
             // --- Controls ---
-             const presetControlsDiv = document.getElementById('presetControls');
-             const sampleControlsDiv = document.getElementById('sampleControls');
-             const samplingDistControlsDiv = document.getElementById('samplingDistControls');
-             const drawSampleBtn = document.getElementById('drawSampleBtn');
-             const draw100SamplesBtn = document.getElementById('draw100SamplesBtn');
-             const nValDisplay = document.getElementById('nValDisplay');
-             const resetBtn = document.getElementById('resetBtn');
+            const presetControlsDiv = document.getElementById('presetControls');
+            const sampleControlsDiv = document.getElementById('sampleControls');
+            const samplingDistControlsDiv = document.getElementById('samplingDistControls');
+            const drawSampleBtn = document.getElementById('drawSampleBtn');
+            const draw100SamplesBtn = document.getElementById('draw100SamplesBtn');
+            const draw1000SamplesBtn = document.getElementById('draw1000SamplesBtn');
+            const nValDisplay = document.getElementById('nValDisplay');
+            const resetBtn = document.getElementById('resetBtn');
+            const showNormalCurveCheckbox = document.getElementById('showNormalCurve');
+            const samplingDistStatNameSpan = document.getElementById('samplingDistStatName');
 
             // --- Constants ---
             const NUM_BINS = 50;
             const NUM_SAMPLING_DIST_BINS = 40;
-            const MIN_VALUE = 0; const MAX_VALUE = 100;
-            const SAMPLING_DIST_MIN = 0; const SAMPLING_DIST_MAX = 100;
+            const MIN_VALUE = 0;
+            const MAX_VALUE = 100;
+            const SAMPLING_DIST_MIN = 0;
+            const SAMPLING_DIST_MAX = 100;
             const binWidthValue = (MAX_VALUE - MIN_VALUE) / NUM_BINS;
             const samplingDistBinWidth = (SAMPLING_DIST_MAX - SAMPLING_DIST_MIN) / NUM_SAMPLING_DIST_BINS;
             const MAX_POTENTIAL = 1.0;
+            const ANIMATION_DELAY_VERY_SLOW_MS = 180;
             const ANIMATION_DELAY_SLOW_MS = 180;
             const ANIMATION_DELAY_FAST_MS = 40;
-            const HIGHLIGHT_COLOR = '#6f42c1';
+            const HIGHLIGHT_COLOR = getComputedStyle(document.documentElement)
+                                    .getPropertyValue('--highlight-color').trim() || '#6f42c1';
+            const NORMAL_CURVE_COLOR = getComputedStyle(document.documentElement)
+                                       .getPropertyValue('--normal-curve-color').trim() || '#17a2b8';
+            const ANIM_MARKER_COLOR = getComputedStyle(document.documentElement)
+                                      .getPropertyValue('--anim-marker-color').trim() || 'rgba(40, 167, 69, 0.8)';
             const INITIAL_Y_MAX = 10;
 
             // --- State Variables ---
-            let populationDistribution = []; let isDraggingPop = false;
-            let currentSampleData = []; let sampleBins = new Array(NUM_BINS).fill(0);
-            let isProcessing = false; let currentSampleSize = 5;
-            let samplingDistributionData = []; let samplingDistributionBins = new Array(NUM_SAMPLING_DIST_BINS).fill(0);
-            let selectedSamplingStat = 'mean'; let numSamplesDrawn = 0;
+            let populationDistribution = [];
+            let isDraggingPop = false;
+            let currentSampleData = [];
+            let sampleBins = new Array(NUM_BINS).fill(0);
+            let isProcessing = false;
+            let currentSampleSize = 5;
+            let samplingDistributionData = [];
+            let samplingDistributionBins = new Array(NUM_SAMPLING_DIST_BINS).fill(0);
+            let selectedSamplingStat = 'mean';
+            let numSamplesDrawn = 0;
             let lastSampleSizeForSamplingDist = 5;
             let currentSampleYMax = INITIAL_Y_MAX;
             let currentSamplingDistYMax = INITIAL_Y_MAX;
@@ -180,312 +215,336 @@
                 isProcessing = disabled;
                 drawSampleBtn.disabled = disabled;
                 draw100SamplesBtn.disabled = disabled;
+                draw1000SamplesBtn.disabled = disabled;
+                resetBtn.disabled = disabled;
                 presetControlsDiv.querySelectorAll('input')
                     .forEach(el => el.disabled = disabled);
                 sampleControlsDiv.querySelectorAll('input')
                     .forEach(el => el.disabled = disabled);
                 samplingDistControlsDiv.querySelectorAll('input')
-                     .forEach(el => el.disabled = disabled);
+                    .forEach(el => el.disabled = disabled);
                 popCanvas.style.cursor = disabled ? 'not-allowed' : 'crosshair';
             }
 
             // ==================================================================
             // --- Population Functions ---
             // ==================================================================
-             function loadPreset(distributionType) {
-                 populationDistribution = new Array(NUM_BINS).fill(0);
-                 const midVal = (MAX_VALUE + MIN_VALUE) / 2;
-                 const range = MAX_VALUE - MIN_VALUE;
+            function loadPreset(distributionType) {
+                populationDistribution = new Array(NUM_BINS).fill(0);
+                const midVal = (MAX_VALUE + MIN_VALUE) / 2;
+                const range = MAX_VALUE - MIN_VALUE;
 
-                 switch (distributionType) {
-                    case 'normal':
+                switch (distributionType) {
+                    case 'normal': {
                         const meanN = midVal;
                         const stdDevN = range / 6;
                         for (let i = 0; i < NUM_BINS; i++) {
-                             const center = MIN_VALUE + (i + 0.5) * binWidthValue;
-                             const exponent = -0.5 * Math.pow((center - meanN) / stdDevN, 2);
-                             const potential = Math.exp(exponent);
-                             populationDistribution[i] = Math.min(MAX_POTENTIAL, potential * MAX_POTENTIAL);
-                         }
-                         break;
-                     case 'uniform':
-                         populationDistribution = populationDistribution.map(() => MAX_POTENTIAL * 0.6);
-                         break;
-                     case 'exponential':
-                         const lambda = 5 / range;
-                         const maxExpPotential = lambda; // Approx max at value=0
-                         for (let i = 0; i < NUM_BINS; i++) {
-                             const center = MIN_VALUE + (i + 0.5) * binWidthValue;
-                             const potential = lambda * Math.exp(-lambda * center);
-                             const scaledPotential = (potential / maxExpPotential) * MAX_POTENTIAL * 0.95;
-                             populationDistribution[i] = Math.min(MAX_POTENTIAL, scaledPotential);
-                         }
-                         break;
-                     case 'bimodal':
-                         const meanB1 = range / 4;
-                         const meanB2 = range * 3 / 4;
-                         const stdDevB = range / 15;
-                         let peakPotential = 0;
-                         for (let i = 0; i < NUM_BINS; i++) {
-                             const center = MIN_VALUE + (i + 0.5) * binWidthValue;
-                             const exp1 = -0.5 * Math.pow((center - meanB1) / stdDevB, 2);
-                             const exp2 = -0.5 * Math.pow((center - meanB2) / stdDevB, 2);
-                             const potential1 = 0.6 * Math.exp(exp1);
-                             const potential2 = 0.6 * Math.exp(exp2);
-                             populationDistribution[i] = potential1 + potential2;
-                             peakPotential = Math.max(peakPotential, populationDistribution[i]);
-                         }
-                         if (peakPotential > 1e-6) {
-                             const scaleFactor = (MAX_POTENTIAL / peakPotential) * 0.95;
-                             populationDistribution = populationDistribution.map(p => Math.min(MAX_POTENTIAL, p * scaleFactor));
-                         }
-                         break;
+                            const center = MIN_VALUE + (i + 0.5) * binWidthValue;
+                            const exponent = -0.5 * Math.pow((center - meanN) / stdDevN, 2);
+                            const potential = Math.exp(exponent);
+                            populationDistribution[i] = Math.min(MAX_POTENTIAL, potential * MAX_POTENTIAL);
+                        }
+                        break;
+                    }
+                    case 'uniform': {
+                        populationDistribution = populationDistribution.map(() => MAX_POTENTIAL * 0.6);
+                        break;
+                    }
+                    case 'exponential': {
+                        const lambda = 5 / range;
+                        const maxExpPotential = lambda;
+                        for (let i = 0; i < NUM_BINS; i++) {
+                            const center = MIN_VALUE + (i + 0.5) * binWidthValue;
+                            const potential = lambda * Math.exp(-lambda * center);
+                            const scaledPotential = (potential / maxExpPotential) * MAX_POTENTIAL * 0.95;
+                            populationDistribution[i] = Math.min(MAX_POTENTIAL, scaledPotential);
+                        }
+                        break;
+                    }
+                    case 'bimodal': {
+                        const meanB1 = range / 4;
+                        const meanB2 = range * 3 / 4;
+                        const stdDevB = range / 15;
+                        let peakPotential = 0;
+                        for (let i = 0; i < NUM_BINS; i++) {
+                            const center = MIN_VALUE + (i + 0.5) * binWidthValue;
+                            const exp1 = -0.5 * Math.pow((center - meanB1) / stdDevB, 2);
+                            const exp2 = -0.5 * Math.pow((center - meanB2) / stdDevB, 2);
+                            const potential1 = 0.6 * Math.exp(exp1);
+                            const potential2 = 0.6 * Math.exp(exp2);
+                            populationDistribution[i] = potential1 + potential2;
+                            peakPotential = Math.max(peakPotential, populationDistribution[i]);
+                        }
+                        if (peakPotential > 1e-6) {
+                            const scaleFactor = (MAX_POTENTIAL / peakPotential) * 0.95;
+                            populationDistribution = populationDistribution
+                                .map(p => Math.min(MAX_POTENTIAL, p * scaleFactor));
+                        }
+                        break;
+                    }
                     default:
-                         loadPreset('normal'); // Fallback
-                         return;
-                 }
-                 updatePopulation();
-                 clearSample();
-                 clearSamplingDistribution();
-             }
+                        loadPreset('normal'); // Fallback
+                        return;
+                }
+                updatePopulation();
+                clearSample();
+                clearSamplingDistribution();
+            }
 
-             function drawPopulationHistogram() {
-                 try {
-                     const { width, height } = popCanvas;
-                     popCtx.clearRect(0, 0, width, height);
-                     popCtx.fillStyle = '#ffffff';
-                     popCtx.fillRect(0, 0, width, height);
+            function drawPopulationHistogram() {
+                try {
+                    const { width, height } = popCanvas;
+                    const plotHeight = height * 0.95;
+                    const canvasBg = getComputedStyle(document.documentElement)
+                                     .getPropertyValue('--canvas-bg').trim() || '#ffffff';
+                    const popLineColor = getComputedStyle(document.documentElement)
+                                         .getPropertyValue('--pop-line-color').trim() || '#007bff';
+                    const popFillColor = getComputedStyle(document.documentElement)
+                                         .getPropertyValue('--pop-fill-color').trim() || 'rgba(0, 123, 255, 0.15)';
 
-                     const barWidth = width / NUM_BINS;
-                     const plotHeight = height * 0.95;
-                     popCtx.fillStyle = '#007bff';
-                     popCtx.strokeStyle = '#0056b3';
-                     popCtx.lineWidth = 1;
 
-                     for (let i = 0; i < NUM_BINS; i++) {
-                         const potential = populationDistribution[i];
-                         const barHeight = Math.max(0, (Math.min(potential, MAX_POTENTIAL) / MAX_POTENTIAL) * plotHeight);
-                         const x = i * barWidth;
-                         const y = height - barHeight;
+                    popCtx.clearRect(0, 0, width, height);
+                    popCtx.fillStyle = canvasBg;
+                    popCtx.fillRect(0, 0, width, height);
 
-                         popCtx.fillRect(x, y, barWidth, barHeight);
-                         if (barHeight > 0) {
-                             popCtx.strokeRect(x + 0.5, y + 0.5, barWidth - 1, Math.max(0, barHeight - 1));
+                    popCtx.beginPath();
+                    popCtx.strokeStyle = popLineColor;
+                    popCtx.fillStyle = popFillColor;
+                    popCtx.lineWidth = 2;
+
+                    let firstPoint = true;
+                    for (let i = 0; i < NUM_BINS; i++) {
+                        const potential = populationDistribution[i] || 0;
+                        const yRatio = Math.min(potential, MAX_POTENTIAL) / MAX_POTENTIAL;
+                        const y = height - Math.max(0, yRatio * plotHeight);
+                        // Use center of bin for x coordinate of the curve point
+                        const x = (i + 0.5) * (width / NUM_BINS);
+
+                        if (firstPoint) {
+                            popCtx.moveTo(0, height); // Start fill from bottom-left
+                            popCtx.lineTo(x, y);
+                            firstPoint = false;
+                        } else {
+                            popCtx.lineTo(x, y);
+                        }
+                    }
+                    popCtx.lineTo(width, height); // End fill at bottom-right
+                    popCtx.closePath(); // Close path for filling
+                    popCtx.fill();
+                    popCtx.stroke(); // Draw the outline curve
+
+                    // Draw X axis line
+                    popCtx.strokeStyle = '#333';
+                    popCtx.lineWidth = 1;
+                    popCtx.beginPath();
+                    popCtx.moveTo(0, height);
+                    popCtx.lineTo(width, height);
+                    popCtx.stroke();
+                } catch (e) {
+                    console.error("Err drawPopHist:", e);
+                }
+            }
+
+            function calculatePopulationStats() {
+                try {
+                    const totalWeight = populationDistribution.reduce((s, v) => s + (v > 0 ? v : 0), 0);
+                    if (totalWeight < 1e-9) return { mean: NaN, median: NaN, stdDev: NaN };
+
+                    let weightedSum = 0;
+                    let weightedSumSq = 0;
+                    const dataPoints = [];
+
+                    for (let i = 0; i < NUM_BINS; i++) {
+                        const potential = populationDistribution[i];
+                        if (potential <= 1e-9) continue;
+                        const prob = potential / totalWeight;
+                        const value = MIN_VALUE + (i + 0.5) * binWidthValue;
+                        weightedSum += value * prob;
+                        weightedSumSq += (value * value) * prob;
+                        dataPoints.push({ value, prob });
+                    }
+
+                    const mean = weightedSum;
+                    const variance = weightedSumSq - (mean * mean);
+                    const stdDev = Math.sqrt(Math.max(0, variance));
+
+                    // Calculate Median via CDF
+                    dataPoints.sort((a, b) => a.value - b.value);
+                    let cumulativeProb = 0;
+                    const cumulativeData = dataPoints.map(dp => {
+                        cumulativeProb += dp.prob;
+                        return { value: dp.value, cumulativeProb: Math.min(1.0, cumulativeProb) };
+                    });
+
+                    const findValueAtQuantile = (quantile) => {
+                        if (cumulativeData.length === 0) return NaN;
+                        const epsilon = 1e-9;
+                        const targetBinIndex = cumulativeData
+                            .findIndex(dp => dp.cumulativeProb >= quantile - epsilon);
+                        if (targetBinIndex === -1) return cumulativeData[cumulativeData.length - 1]?.value ?? NaN;
+
+                        const targetBin = cumulativeData[targetBinIndex];
+                        const originalDataPoint = dataPoints.find(dp => dp.value === targetBin.value);
+                        if (!originalDataPoint) return targetBin.value;
+
+                        const binProb = originalDataPoint.prob;
+                        const prevCumulativeProb = targetBinIndex > 0 ? cumulativeData[targetBinIndex - 1].cumulativeProb : 0;
+                        if (binProb <= epsilon) return targetBin.value;
+
+                        const fractionIntoBin = (quantile - prevCumulativeProb) / binProb;
+                        const clampedFraction = Math.max(0, Math.min(1, fractionIntoBin));
+
+                        let originalPopBinIndex = -1;
+                         for(let idx=0; idx<populationDistribution.length; idx++){
+                             const binCenter = MIN_VALUE + (idx + 0.5) * binWidthValue;
+                             if(Math.abs(binCenter - targetBin.value) < epsilon){ originalPopBinIndex=idx; break;}
                          }
-                     }
+                         if(originalPopBinIndex<0) return targetBin.value;
 
-                     popCtx.strokeStyle = '#333';
-                     popCtx.lineWidth = 1;
-                     popCtx.beginPath();
-                     popCtx.moveTo(0, height);
-                     popCtx.lineTo(width, height);
-                     popCtx.stroke();
-                 } catch (e) { console.error("Err drawPopHist:", e); }
-             }
+                        const lowerBound = MIN_VALUE + originalPopBinIndex * binWidthValue;
+                        return lowerBound + (clampedFraction * binWidthValue);
+                    };
 
-             function calculatePopulationStats() {
-                 try {
-                     const totalWeight = populationDistribution.reduce((s, v) => s + (v > 0 ? v : 0), 0);
-                     if (totalWeight < 1e-9) return { mean: NaN, median: NaN, stdDev: NaN };
+                    const median = findValueAtQuantile(0.50);
+                    return { mean, median, stdDev };
+                } catch (e) {
+                    console.error("Err calcPopStats:", e);
+                    return { mean: NaN, median: NaN, stdDev: NaN };
+                }
+            }
 
-                     let weightedSum = 0;
-                     let weightedSumSq = 0;
-                     const dataPoints = []; // {value, prob} pairs
+            function updatePopulationStatsDisplay(stats) {
+                try {
+                    popStatsDisplay.mean.textContent = isNaN(stats.mean) ? '-' : stats.mean.toFixed(1);
+                    popStatsDisplay.median.textContent = isNaN(stats.median) ? '-' : stats.median.toFixed(1);
+                    popStatsDisplay.stdDev.textContent = isNaN(stats.stdDev) ? '-' : stats.stdDev.toFixed(1);
+                } catch (e) {
+                    console.error("Err updatePopStatsDisp:", e);
+                }
+            }
 
-                     for (let i = 0; i < NUM_BINS; i++) {
-                         const potential = populationDistribution[i];
-                         if (potential <= 1e-9) continue;
+            function updatePopulation() {
+                try {
+                    drawPopulationHistogram();
+                    const stats = calculatePopulationStats();
+                    updatePopulationStatsDisplay(stats);
+                } catch (e) {
+                    console.error("Error updating population:", e);
+                }
+            }
 
-                         const prob = potential / totalWeight;
-                         const value = MIN_VALUE + (i + 0.5) * binWidthValue;
-                         weightedSum += value * prob;
-                         weightedSumSq += (value * value) * prob;
-                         dataPoints.push({ value: value, prob: prob });
-                     }
+            function getPopBinIndexFromX(clientX) {
+                try {
+                    const rect = popCanvas.getBoundingClientRect();
+                    const x = clientX - rect.left;
+                    const displayWidth = popCanvas.clientWidth || 1;
+                    const scaleX = popCanvas.width / displayWidth;
+                    const trueX = x * scaleX;
+                    const binPixelWidth = popCanvas.width / NUM_BINS;
+                    let index = Math.floor(trueX / binPixelWidth);
+                    return Math.max(0, Math.min(NUM_BINS - 1, index));
+                } catch (e) {
+                    console.error("Error in getPopBinIndexFromX:", e);
+                    return -1;
+                }
+            }
 
-                     const mean = weightedSum;
-                     const variance = weightedSumSq - (mean * mean);
-                     const stdDev = Math.sqrt(Math.max(0, variance));
+            function applyPopulationDrawing(e) {
+                try {
+                    if (isProcessing) return;
+                    const index = getPopBinIndexFromX(e.clientX);
+                    if (index < 0) return;
 
-                     // --- Calculate Median ---
-                     dataPoints.sort((a, b) => a.value - b.value);
-                     let cumulativeProb = 0;
-                     const cumulativeData = dataPoints.map(dp => {
-                         cumulativeProb += dp.prob;
-                         return { value: dp.value, cumulativeProb: Math.min(1.0, cumulativeProb) };
-                     });
+                    const rect = popCanvas.getBoundingClientRect();
+                    const y = e.clientY - rect.top;
+                    const displayHeight = popCanvas.clientHeight || 1;
+                    const scaleY = popCanvas.height / displayHeight;
+                    const trueY = y * scaleY;
+                    const canvasHeight = popCanvas.height;
 
-                     const findValueAtQuantile = (quantile) => {
-                         if (cumulativeData.length === 0) return NaN;
-                         const epsilon = 1e-9;
-                         const targetBinIndex = cumulativeData.findIndex(dp => dp.cumulativeProb >= quantile - epsilon);
+                    const potentialRatio = (canvasHeight - trueY) / canvasHeight;
+                    const boostFactor = 1.05;
+                    let potential = potentialRatio * MAX_POTENTIAL * boostFactor;
+                    potential = Math.max(0.0, Math.min(MAX_POTENTIAL, potential));
 
-                         if (targetBinIndex === -1) return cumulativeData[cumulativeData.length - 1]?.value ?? NaN;
-
-                         const targetBin = cumulativeData[targetBinIndex];
-                         // Find corresponding original data point for its probability
-                         const originalDataPoint = dataPoints.find(dp => dp.value === targetBin.value);
-                         if (!originalDataPoint) return targetBin.value; // Fallback
-
-                         const binProb = originalDataPoint.prob;
-                         const prevCumulativeProb = targetBinIndex > 0 ? cumulativeData[targetBinIndex - 1].cumulativeProb : 0;
-
-                         if (binProb <= epsilon) return targetBin.value; // Return center if bin has no mass
-
-                         const fractionIntoBin = (quantile - prevCumulativeProb) / binProb;
-
-                         // Find original index for interpolation base
-                         const originalPopBinIndex = populationDistribution.findIndex((_, idx) =>
-                              Math.abs((MIN_VALUE + (idx + 0.5) * binWidthValue) - targetBin.value) < epsilon);
-
-                         if (originalPopBinIndex < 0) return targetBin.value; // Fallback
-
-                         const lowerBound = MIN_VALUE + originalPopBinIndex * binWidthValue;
-                         const interpolatedValue = lowerBound + (Math.max(0, Math.min(1, fractionIntoBin)) * binWidthValue);
-                         return interpolatedValue;
-                     };
-
-                     const median = findValueAtQuantile(0.50);
-                     return { mean, median, stdDev };
-
-                 } catch (e) {
-                     console.error("Err calcPopStats:", e);
-                     return { mean: NaN, median: NaN, stdDev: NaN };
-                 }
-             }
-
-             function updatePopulationStatsDisplay(stats) {
-                 try {
-                     popStatsDisplay.mean.textContent = isNaN(stats.mean) ? '-' : stats.mean.toFixed(1);
-                     popStatsDisplay.median.textContent = isNaN(stats.median) ? '-' : stats.median.toFixed(1);
-                     popStatsDisplay.stdDev.textContent = isNaN(stats.stdDev) ? '-' : stats.stdDev.toFixed(1);
-                 } catch (e) { console.error("Err updatePopStatsDisp:", e); }
-             }
-
-             function updatePopulation() {
-                 try {
-                     drawPopulationHistogram();
-                     const stats = calculatePopulationStats();
-                     updatePopulationStatsDisplay(stats);
-                 } catch (e) { console.error("Error updating population:", e); }
-             }
-
-             function getPopBinIndexFromX(clientX) {
-                 try {
-                     const rect = popCanvas.getBoundingClientRect();
-                     const x = clientX - rect.left;
-                     const displayWidth = popCanvas.clientWidth || 1; // Avoid division by zero
-                     const scaleX = popCanvas.width / displayWidth;
-                     const trueX = x * scaleX;
-                     const binPixelWidth = popCanvas.width / NUM_BINS;
-                     let index = Math.floor(trueX / binPixelWidth);
-                     return Math.max(0, Math.min(NUM_BINS - 1, index)); // Clamp index
-                 } catch (e) { console.error("Error in getPopBinIndexFromX:", e); return -1; }
-             }
-
-             function applyPopulationDrawing(e) {
-                 try {
-                     if (isProcessing) return;
-                     const index = getPopBinIndexFromX(e.clientX);
-                     if (index < 0) return;
-
-                     const rect = popCanvas.getBoundingClientRect();
-                     const y = e.clientY - rect.top;
-                     const displayHeight = popCanvas.clientHeight || 1;
-                     const scaleY = popCanvas.height / displayHeight;
-                     const trueY = y * scaleY;
-                     const canvasHeight = popCanvas.height;
-
-                     const potentialRatio = (canvasHeight - trueY) / canvasHeight;
-                     const boostFactor = 1.05; // Allow reaching top slightly easier
-                     let potential = potentialRatio * MAX_POTENTIAL * boostFactor;
-                     potential = Math.max(0.0, Math.min(MAX_POTENTIAL, potential));
-
-                     populationDistribution[index] = potential;
-                     updatePopulation();
-                     clearSample();
-                     clearSamplingDistribution();
-                 } catch (e) { console.error("Error applying population drawing:", e); }
-             }
+                    populationDistribution[index] = potential;
+                    updatePopulation();
+                    clearSample();
+                    clearSamplingDistribution();
+                } catch (e) {
+                    console.error("Error applying population drawing:", e);
+                }
+            }
 
             // ==================================================================
             // --- Sampling Functions ---
             // ==================================================================
-             function getPopulationCDF() {
-                 try {
-                     const totalWeight = populationDistribution.reduce((s, v) => s + (v > 0 ? v : 0), 0);
-                     if (totalWeight < 1e-9 || isNaN(totalWeight)) return null;
+            function getPopulationCDF() {
+                try {
+                    const totalWeight = populationDistribution.reduce((s, v) => s + (v > 0 ? v : 0), 0);
+                    if (totalWeight < 1e-9 || isNaN(totalWeight)) return null;
+                    let cdf = [], cP = 0;
+                    for (let i = 0; i < NUM_BINS; i++) {
+                        const potVal = populationDistribution[i] || 0;
+                        const p = (potVal > 0 ? potVal : 0) / totalWeight;
+                        cP += p;
+                        cdf.push(Math.min(1.0, cP));
+                    }
+                    if (cdf.length > 0) cdf[cdf.length - 1] = 1.0;
+                    return cdf;
+                } catch (e) { console.error("Error generating population CDF:", e); return null; }
+            }
 
-                     let cdf = [];
-                     let cumulativeProb = 0;
-                     for (let i = 0; i < NUM_BINS; i++) {
-                         const potentialValue = populationDistribution[i] || 0;
-                         const probability = (potentialValue > 0 ? potentialValue : 0) / totalWeight;
-                         cumulativeProb += probability;
-                         cdf.push(Math.min(1.0, cumulativeProb)); // Clamp at 1.0
-                     }
-                     // Ensure last value is exactly 1.0 due to potential float errors
-                     if (cdf.length > 0) cdf[cdf.length - 1] = 1.0;
-                     return cdf;
-                 } catch (e) { console.error("Error generating population CDF:", e); return null; }
-             }
+            function drawOneValue(cdf) {
+                try {
+                    if (!cdf || cdf.length === 0) return null;
+                    const r = Math.random();
+                    const binIndex = cdf.findIndex(p => p >= r - 1e-9);
+                    if (binIndex === -1) return MIN_VALUE + (NUM_BINS - 0.5) * binWidthValue;
 
-             function drawOneValue(cdf) {
-                 try {
-                     if (!cdf || cdf.length === 0) return null;
-                     const r = Math.random();
-                     const binIndex = cdf.findIndex(p => p >= r - 1e-9); // Find first bin where CDF >= r (with tolerance)
+                    const pS = binIndex > 0 ? cdf[binIndex - 1] : 0;
+                    const pE = cdf[binIndex];
+                    const bPM = pE - pS;
+                    let v;
+                    if (bPM < 1e-9) {
+                        v = MIN_VALUE + (binIndex + 0.5) * binWidthValue;
+                    } else {
+                        const f = (r - pS) / bPM;
+                        const binStartValue = MIN_VALUE + binIndex * binWidthValue;
+                        v = binStartValue + (Math.max(0, Math.min(1, f)) * binWidthValue);
+                    }
+                    return Math.max(MIN_VALUE, Math.min(MAX_VALUE, v));
+                } catch (e) { console.error("Error drawing one value:", e); return null; }
+            }
 
-                     if (binIndex === -1) {
-                         // Should ideally not happen if CDF ends in 1.0
-                         console.warn("Sampling warning: random value", r, "not found in CDF. Using last bin.");
-                         return MIN_VALUE + (NUM_BINS - 0.5) * binWidthValue; // Fallback: center of last bin
-                     }
+            function animateSingleDraw(value, sourceBinIndex, highlightClearDelay) {
+                try {
+                    if (value === null) return;
+                    const { width: popW, height: popH } = popCanvas;
+                    const valueRange = MAX_VALUE - MIN_VALUE;
+                    const clampedValue = Math.max(MIN_VALUE, Math.min(MAX_VALUE, value));
+                    const markerX = ((clampedValue - MIN_VALUE) / valueRange) * popW;
+                    const markerY = popH;
+                    const markerSize = 3;
 
-                     const probStart = binIndex > 0 ? cdf[binIndex - 1] : 0;
-                     const probEnd = cdf[binIndex];
-                     const binProbMass = probEnd - probStart;
+                    const originalFillStyle = popCtx.fillStyle;
+                    popCtx.fillStyle = ANIM_MARKER_COLOR;
+                    popCtx.beginPath();
+                    popCtx.arc(markerX, markerY - markerSize, markerSize, 0, 2 * Math.PI);
+                    popCtx.fill();
+                    popCtx.fillStyle = originalFillStyle;
 
-                     let value;
-                     if (binProbMass < 1e-9) {
-                         // If bin has negligible probability mass, use its center value
-                         value = MIN_VALUE + (binIndex + 0.5) * binWidthValue;
-                     } else {
-                         // Interpolate within the bin based on where 'r' falls within its probability mass
-                         const fractionIntoBin = (r - probStart) / binProbMass;
-                         const binStartValue = MIN_VALUE + binIndex * binWidthValue;
-                         value = binStartValue + (Math.max(0, Math.min(1, fractionIntoBin)) * binWidthValue); // Clamp fraction
-                     }
-                     return Math.max(MIN_VALUE, Math.min(MAX_VALUE, value)); // Clamp final value to overall range
-                 } catch (e) { console.error("Error drawing one value:", e); return null; }
-             }
+                    setTimeout(() => { updatePopulation(); }, highlightClearDelay);
 
-             function animateSingleDraw(value, sourceBinIndex, highlightClearDelay) {
-                 try {
-                     if (value === null) return;
-                     const { width: popW, height: popH } = popCanvas;
-                     const popBarW = popW / NUM_BINS;
-                     // Ensure source index is valid before using for drawing
-                     const validSourceIndex = (sourceBinIndex >= 0 && sourceBinIndex < NUM_BINS) ? sourceBinIndex : 0;
-
-                     // Highlight source bin
-                     popCtx.fillStyle = 'rgba(255, 0, 0, 0.4)';
-                     popCtx.fillRect(validSourceIndex * popBarW, 0, popBarW, popH);
-                     setTimeout(() => { updatePopulation(); }, highlightClearDelay); // Use passed delay
-
-                     // Add to sample
-                     const targetBinIndex = Math.max(0, Math.min(NUM_BINS - 1,
-                          Math.floor((value - MIN_VALUE) / binWidthValue)));
-
-                     if (targetBinIndex >= 0 && targetBinIndex < NUM_BINS) {
-                         sampleBins[targetBinIndex]++;
-                         currentSampleData.push(value);
-                         drawSampleHistogram(); // Redraw sample incrementally
-                     } else {
-                         console.warn("Sample target bin index out of range:", targetBinIndex);
-                     }
-                 } catch (e) { console.error("Error in animateSingleDraw:", e); }
-             }
+                    const targetBinIndex = Math.max(0, Math.min(NUM_BINS - 1,
+                         Math.floor((value - MIN_VALUE) / binWidthValue)));
+                    if (targetBinIndex >= 0 && targetBinIndex < NUM_BINS) {
+                        sampleBins[targetBinIndex]++;
+                        currentSampleData.push(value);
+                        drawSampleHistogram();
+                    } else { console.warn("Sample target bin index out of range:", targetBinIndex); }
+                } catch (e) { console.error("Error in animateSingleDraw:", e); }
+            }
 
             // ==================================================================
             // --- Sample Display & Stats ---
@@ -497,113 +556,134 @@
                     currentSampleYMax = INITIAL_Y_MAX;
                     drawSampleHistogram();
                     Object.values(sampleStatsDisplay).forEach(el => el.textContent = '-');
-                    sampleStatsDisplay.n.textContent = '0';
-                } catch(e){ console.error("Error clearing sample:", e); }
+                    sampleStatsDisplay.n.textContent = '-';
+                } catch (e) { console.error("Error clearing sample:", e); }
             }
 
             function drawSampleHistogram() {
                 try {
                     const { width, height } = sampleCanvas;
                     const plotHeight = height * 0.95;
-
-                    // Update Y Max Scale dynamically
-                    const maxCount = Math.max(...sampleBins);
+                    const maxCount = sampleBins.length > 0 ? Math.max(...sampleBins) : 0;
                     const requiredYMax = Math.max(INITIAL_Y_MAX, Math.ceil(maxCount / 5) * 5);
-                    if (requiredYMax > currentSampleYMax) {
-                        currentSampleYMax = requiredYMax;
-                    }
+                    if (requiredYMax > currentSampleYMax) { currentSampleYMax = requiredYMax; }
 
-                    // Drawing logic
+                    const canvasBg = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim() || '#ffffff';
+                    const barFill = getComputedStyle(document.documentElement).getPropertyValue('--sample-bar-fill').trim() || '#28a745';
+                    const barStroke = getComputedStyle(document.documentElement).getPropertyValue('--sample-bar-stroke').trim() || '#1c7430';
+
                     sampleCtx.clearRect(0, 0, width, height);
-                    sampleCtx.fillStyle = '#ffffff';
+                    sampleCtx.fillStyle = canvasBg;
                     sampleCtx.fillRect(0, 0, width, height);
                     const barWidthPixels = width / NUM_BINS;
-                    sampleCtx.fillStyle = '#28a745';
-                    sampleCtx.strokeStyle = '#1c7430';
+                    sampleCtx.fillStyle = barFill;
+                    sampleCtx.strokeStyle = barStroke;
                     sampleCtx.lineWidth = 1;
 
                     for (let i = 0; i < NUM_BINS; i++) {
                         const count = sampleBins[i];
                         if (count === 0) continue;
-                        // Scale relative to current (dynamic) Y max
-                        const barHeight = Math.max(0, (count / currentSampleYMax) * plotHeight);
+                        const barHeightRatio = count / currentSampleYMax;
+                        const barHeight = Math.max(0, barHeightRatio * plotHeight);
                         const x = i * barWidthPixels;
                         const y = height - barHeight;
                         const clampedHeight = Math.min(barHeight, plotHeight);
                         sampleCtx.fillRect(x, y, barWidthPixels, clampedHeight);
                         sampleCtx.strokeRect(x + 0.5, y + 0.5, barWidthPixels - 1, Math.max(0, clampedHeight - 1));
                     }
-                    // Draw X axis
                     sampleCtx.strokeStyle = '#333';
                     sampleCtx.lineWidth = 1;
                     sampleCtx.beginPath();
                     sampleCtx.moveTo(0, height);
                     sampleCtx.lineTo(width, height);
                     sampleCtx.stroke();
-                } catch(e) { console.error("Error drawing sample histogram:", e); }
+                } catch (e) { console.error("Error drawing sample histogram:", e); }
             }
 
             function highlightSampleStat(statValue) {
-                 if (statValue === undefined || isNaN(statValue)) return;
-                 try {
-                     const { width, height } = sampleCanvas;
-                     const plotHeight = height * 0.95;
-                     const valueRange = MAX_VALUE - MIN_VALUE;
-                     // Clamp stat value to be within plot range before calculating x
-                     const clampedValue = Math.max(MIN_VALUE, Math.min(MAX_VALUE, statValue));
-                     const x = ((clampedValue - MIN_VALUE) / valueRange) * width;
+                if (statValue === undefined || isNaN(statValue)) return;
+                try {
+                    const { width, height } = sampleCanvas;
+                    const valueRange = MAX_VALUE - MIN_VALUE;
+                    const clampedValue = Math.max(MIN_VALUE, Math.min(MAX_VALUE, statValue));
+                    const x = ((clampedValue - MIN_VALUE) / valueRange) * width;
 
-                     // Draw line
-                     sampleCtx.strokeStyle = HIGHLIGHT_COLOR;
-                     sampleCtx.fillStyle = HIGHLIGHT_COLOR;
-                     sampleCtx.lineWidth = 2;
-                     sampleCtx.beginPath();
-                     sampleCtx.moveTo(x, 0);
-                     sampleCtx.lineTo(x, plotHeight);
-                     sampleCtx.stroke();
+                    const markerSize = 4;
+                    const labelPadding = 2;
+                    const textHeightEstimate = 10;
+                    const markerHeight = markerSize * 1.5;
+                    const markerTipY = height - 1; // Tip near axis
+                    const markerBaseY = markerTipY - markerHeight; // Base above tip
 
-                     // Draw marker
-                     const markerSize = 3;
-                     sampleCtx.beginPath();
-                     sampleCtx.moveTo(x - markerSize, height - markerSize);
-                     sampleCtx.lineTo(x + markerSize, height - markerSize);
-                     sampleCtx.lineTo(x, height);
-                     sampleCtx.closePath();
-                     sampleCtx.fill();
-                 } catch(e) { console.error("Error drawing sample stat highlight:", e); }
-             }
+                    // Draw Triangle Marker
+                    sampleCtx.fillStyle = HIGHLIGHT_COLOR;
+                    sampleCtx.beginPath();
+                    sampleCtx.moveTo(x - markerSize, markerBaseY);
+                    sampleCtx.lineTo(x + markerSize, markerBaseY);
+                    sampleCtx.lineTo(x, markerTipY);
+                    sampleCtx.closePath();
+                    sampleCtx.fill();
+
+                    // Add Text Label
+                    let statName = selectedSamplingStat.charAt(0).toUpperCase() + selectedSamplingStat.slice(1);
+                    if (statName === 'StdDev') statName = 'Std Dev';
+                    const labelText = `${statName}: ${statValue.toFixed(1)}`;
+                    sampleCtx.fillStyle = HIGHLIGHT_COLOR;
+                    sampleCtx.font = 'bold 9px sans-serif';
+                    sampleCtx.textAlign = 'center';
+                    sampleCtx.textBaseline = 'bottom';
+                    const labelY = markerBaseY - labelPadding;
+
+                    // Adjust label X near edges
+                    let labelX = x;
+                    const textMetrics = sampleCtx.measureText(labelText);
+                    const textWidth = textMetrics.width;
+                    const edgePadding = 4;
+                    if (labelX - textWidth / 2 < edgePadding) {
+                        labelX = textWidth / 2 + edgePadding;
+                        sampleCtx.textAlign = 'left';
+                    } else if (labelX + textWidth / 2 > width - edgePadding) {
+                        labelX = width - textWidth / 2 - edgePadding;
+                        sampleCtx.textAlign = 'right';
+                    }
+
+                    // Draw label if fits vertically
+                    if (labelY > textHeightEstimate) {
+                        sampleCtx.fillText(labelText, labelX, labelY);
+                    } else {
+                        console.warn("Highlight label too close to top edge.");
+                    }
+                } catch (e) { console.error("Error drawing sample stat highlight:", e); }
+            }
 
             function calculateSampleStats(data) {
-                 try {
-                     const n = data.length;
-                     if (n === 0) { return { mean: NaN, median: NaN, stdDev: NaN, n: 0 }; }
-                     const sortedData = [...data].sort((a, b) => a - b);
-                     const sum = data.reduce((acc, val) => acc + val, 0);
-                     const mean = sum / n;
-                     let median;
-                     const mid = Math.floor(n / 2);
-                     if (n % 2 === 0) {
-                         median = (sortedData[mid - 1] + sortedData[mid]) / 2;
-                     } else {
-                         median = sortedData[mid];
-                     }
-                     const sumSq = data.reduce((acc, val) => acc + (val * val), 0);
-                     const variance = (sumSq / n) - (mean * mean);
-                     const stdDev = Math.sqrt(Math.max(0, variance));
-                     return { mean, median, stdDev, n };
-                 } catch(e) {
-                     console.error("Error calculating sample stats:", e);
-                     return { mean: NaN, median: NaN, stdDev: NaN, n: data.length };
-                 }
+                try {
+                    const n = data.length;
+                    if (n === 0) return { mean: NaN, median: NaN, stdDev: NaN, n: 0 };
+                    const sortedData = [...data].sort((a, b) => a - b);
+                    const sum = data.reduce((acc, val) => acc + val, 0);
+                    const mean = sum / n;
+                    let median;
+                    const mid = Math.floor(n / 2);
+                    if (n % 2 === 0) median = (sortedData[mid - 1] + sortedData[mid]) / 2;
+                    else median = sortedData[mid];
+                    const sumSq = data.reduce((acc, val) => acc + (val * val), 0);
+                    const variance = (sumSq / n) - (mean * mean);
+                    const stdDev = Math.sqrt(Math.max(0, variance));
+                    return { mean, median, stdDev, n };
+                } catch (e) {
+                    console.error("Error calculating sample stats:", e);
+                    return { mean: NaN, median: NaN, stdDev: NaN, n: data.length };
+                }
             }
 
             function updateSampleStatsDisplay(stats) {
-                 try {
-                     sampleStatsDisplay.mean.textContent = isNaN(stats.mean) ? '-' : stats.mean.toFixed(1);
-                     sampleStatsDisplay.median.textContent = isNaN(stats.median) ? '-' : stats.median.toFixed(1);
-                     sampleStatsDisplay.stdDev.textContent = isNaN(stats.stdDev) ? '-' : stats.stdDev.toFixed(1);
-                     sampleStatsDisplay.n.textContent = stats.n;
-                 } catch(e) { console.error("Error updating sample stats display:", e); }
+                try {
+                    sampleStatsDisplay.mean.textContent = isNaN(stats.mean)?'-':stats.mean.toFixed(1);
+                    sampleStatsDisplay.median.textContent = isNaN(stats.median)?'-':stats.median.toFixed(1);
+                    sampleStatsDisplay.stdDev.textContent = isNaN(stats.stdDev)?'-':stats.stdDev.toFixed(1);
+                    sampleStatsDisplay.n.textContent = stats.n;
+                } catch (e) { console.error("Error updating sample stats display:", e); }
             }
 
             // ==================================================================
@@ -616,7 +696,8 @@
                      numSamplesDrawn = 0;
                      lastSampleSizeForSamplingDist = currentSampleSize;
                      currentSamplingDistYMax = INITIAL_Y_MAX;
-                     drawSamplingDistributionHistogram();
+                     drawSamplingDistributionHistogram(); // Redraw empty plot
+                     // Reset stats display
                      samplingDistStatsDisplay.count.textContent = '0';
                      samplingDistStatsDisplay.mean.textContent = '-';
                      samplingDistStatsDisplay.median.textContent = '-';
@@ -628,34 +709,50 @@
                  try {
                      const { width, height } = samplingDistCanvas;
                      const plotHeight = height * 0.95;
-
-                     // Update Y Max Scale dynamically
-                     const maxCount = Math.max(...samplingDistributionBins);
+                     const maxCount = samplingDistributionBins.length > 0
+                                      ? Math.max(...samplingDistributionBins) : 0;
                      const requiredYMax = Math.max(INITIAL_Y_MAX, Math.ceil(maxCount / 5) * 5);
                      if (requiredYMax > currentSamplingDistYMax) {
                          currentSamplingDistYMax = requiredYMax;
                      }
 
-                     // Drawing logic
+                     const canvasBg = getComputedStyle(document.documentElement)
+                                      .getPropertyValue('--canvas-bg').trim() || '#ffffff';
+                     const barFill = getComputedStyle(document.documentElement)
+                                     .getPropertyValue('--sampling-bar-fill').trim() || '#28a745';
+                     const barStroke = getComputedStyle(document.documentElement)
+                                       .getPropertyValue('--sampling-bar-stroke').trim() || '#1c7430';
+
                      samplingDistCtx.clearRect(0, 0, width, height);
-                     samplingDistCtx.fillStyle = '#ffffff';
+                     samplingDistCtx.fillStyle = canvasBg;
                      samplingDistCtx.fillRect(0, 0, width, height);
                      const barWidthPixels = width / NUM_SAMPLING_DIST_BINS;
-                     samplingDistCtx.fillStyle = '#fd7e14';
-                     samplingDistCtx.strokeStyle = '#d95f02';
+                     samplingDistCtx.fillStyle = barFill;
+                     samplingDistCtx.strokeStyle = barStroke;
                      samplingDistCtx.lineWidth = 1;
 
                      for (let i = 0; i < NUM_SAMPLING_DIST_BINS; i++) {
                          const count = samplingDistributionBins[i];
                          if (count === 0) continue;
-                         // Scale relative to current dynamic Y max
-                         const barHeight = Math.max(0, (count / currentSamplingDistYMax) * plotHeight);
+                         const barHeightRatio = count / currentSamplingDistYMax;
+                         const barHeight = Math.max(0, barHeightRatio * plotHeight);
                          const x = i * barWidthPixels;
                          const y = height - barHeight;
                          const clampedHeight = Math.min(barHeight, plotHeight);
                          samplingDistCtx.fillRect(x, y, barWidthPixels, clampedHeight);
                          samplingDistCtx.strokeRect(x + 0.5, y + 0.5, barWidthPixels - 1, Math.max(0, clampedHeight - 1));
                      }
+
+                     // Draw Normal Curve if checked and feasible
+                     if (showNormalCurveCheckbox.checked && numSamplesDrawn > 1) {
+                         const stats = calculateSamplingDistributionStats(samplingDistributionData);
+                         const mean = stats.mean;
+                         const stdDev = stats.stdDev;
+                         if (!isNaN(mean) && !isNaN(stdDev) && stdDev > 1e-6) {
+                             drawNormalCurve(mean, stdDev, width, height, plotHeight);
+                         }
+                     }
+
                      // Draw X axis
                      samplingDistCtx.strokeStyle = '#333';
                      samplingDistCtx.lineWidth = 1;
@@ -666,25 +763,51 @@
                  } catch(e) { console.error("Error drawing sampling dist histogram:", e); }
              }
 
+             function drawNormalCurve(mean, stdDev, canvasWidth, canvasHeight, plotHeight) {
+                 const SQRT_2PI = Math.sqrt(2 * Math.PI);
+                 function normalPDF(x, mu, sigma) {
+                     const sigmaSq = sigma * sigma;
+                     const exponent = -((x - mu) * (x - mu)) / (2 * sigmaSq);
+                     return (1 / (sigma * SQRT_2PI)) * Math.exp(exponent);
+                 }
+                 // Scale PDF area to match histogram area
+                 const scaleFactor = numSamplesDrawn * samplingDistBinWidth;
+                 samplingDistCtx.strokeStyle = NORMAL_CURVE_COLOR;
+                 samplingDistCtx.lineWidth = 1.5;
+                 samplingDistCtx.beginPath();
+                 let firstPoint = true;
+                 // Draw curve smoothly
+                 for (let px = 0; px <= canvasWidth; px += 2) {
+                     const value = SAMPLING_DIST_MIN
+                                 + (px / canvasWidth) * (SAMPLING_DIST_MAX - SAMPLING_DIST_MIN);
+                     const pdfValue = normalPDF(value, mean, stdDev);
+                     const scaledPdfHeight = pdfValue * scaleFactor;
+                     // Convert height to y-coordinate using dynamic scale
+                     const y = canvasHeight - (scaledPdfHeight / currentSamplingDistYMax) * plotHeight;
+                     if (y > canvasHeight) continue; // Avoid drawing below axis
+
+                     if (firstPoint) { samplingDistCtx.moveTo(px, y); firstPoint = false; }
+                     else { samplingDistCtx.lineTo(px, y); }
+                 }
+                 samplingDistCtx.stroke();
+             }
+
              function calculateSamplingDistributionStats(data) {
                  try {
                      const n = data.length;
-                     if (n === 0) { return { mean: NaN, median: NaN, stdDev: NaN, n: 0 }; }
+                     if (n === 0) return { mean: NaN, median: NaN, stdDev: NaN, n: 0 };
                      const sortedData = [...data].sort((a, b) => a - b);
                      const sum = data.reduce((acc, val) => acc + val, 0);
                      const mean = sum / n;
                      let median;
                      const mid = Math.floor(n / 2);
-                     if (n % 2 === 0) {
-                         median = (sortedData[mid - 1] + sortedData[mid]) / 2;
-                     } else {
-                         median = sortedData[mid];
-                     }
+                     if (n % 2 === 0) median = (sortedData[mid - 1] + sortedData[mid]) / 2;
+                     else median = sortedData[mid];
                      const sumSq = data.reduce((acc, val) => acc + (val * val), 0);
                      const variance = (sumSq / n) - (mean * mean);
-                     const stdDev = Math.sqrt(Math.max(0, variance));
+                     const stdDev = Math.sqrt(Math.max(0, variance)); // This is Std Dev of the stats (Std Error)
                      return { mean, median, stdDev, n };
-                 } catch(e) {
+                 } catch (e) {
                      console.error("Error calculating sampling dist stats:", e);
                      return { mean: NaN, median: NaN, stdDev: NaN, n: data.length };
                  }
@@ -693,9 +816,9 @@
              function updateSamplingDistributionStatsDisplay(stats) {
                  try {
                      samplingDistStatsDisplay.count.textContent = stats.n;
-                     samplingDistStatsDisplay.mean.textContent = isNaN(stats.mean) ? '-' : stats.mean.toFixed(1);
-                     samplingDistStatsDisplay.median.textContent = isNaN(stats.median) ? '-' : stats.median.toFixed(1);
-                     samplingDistStatsDisplay.stdDev.textContent = isNaN(stats.stdDev) ? '-' : stats.stdDev.toFixed(1);
+                     samplingDistStatsDisplay.mean.textContent = isNaN(stats.mean)?'-':stats.mean.toFixed(1);
+                     samplingDistStatsDisplay.median.textContent = isNaN(stats.median)?'-':stats.median.toFixed(1);
+                     samplingDistStatsDisplay.stdDev.textContent = isNaN(stats.stdDev)?'-':stats.stdDev.toFixed(1); // Displaying Std Error
                  } catch(e) { console.error("Error updating sampling dist stats display:", e); }
              }
 
@@ -707,24 +830,24 @@
                  } catch(e) { console.error("Error updating sampling distribution:", e); }
              }
 
+
             // ==================================================================
             // --- Core Animation & Bulk Sampling ---
             // ==================================================================
              function runSamplingAnimation() {
                  try {
-                     if (isProcessing) { return; }
+                     if (isProcessing) return;
                      if (currentSampleSize !== lastSampleSizeForSamplingDist) {
                          clearSamplingDistribution();
                          lastSampleSizeForSamplingDist = currentSampleSize;
                      }
                      const populationCDF = getPopulationCDF();
-                     if (!populationCDF) {
-                         alert("Cannot draw sample: Population is empty."); return;
-                     }
+                     if (!populationCDF) { alert("Cannot draw sample: Population is empty."); return; }
 
-                     // Determine Animation Delay based on n
-                     const currentAnimDelay = (currentSampleSize <= 10) ? ANIMATION_DELAY_SLOW_MS : ANIMATION_DELAY_FAST_MS;
-                     const highlightClearDelay = currentAnimDelay / 2;
+                     const currentAnimDelay = (currentSampleSize <= 10)
+                                              ? ANIMATION_DELAY_VERY_SLOW_MS // n=5 or n=10 uses very slow
+                                              : ANIMATION_DELAY_FAST_MS; // n=20 or n=100 uses fast
+                     const highlightClearDelay = currentAnimDelay ; // Make highlight slightly shorter than step
 
                      setControlsDisabled(true);
                      clearSample();
@@ -732,16 +855,14 @@
 
                      function drawNext() {
                          if (samplesDrawnThisRun >= currentSampleSize) {
-                             // Finalize sample
+                             // Finalize
                              const sampleStats = calculateSampleStats(currentSampleData);
                              updateSampleStatsDisplay(sampleStats);
                              const statValue = sampleStats[selectedSamplingStat];
+                             drawSampleHistogram(); // Redraw clean histogram
+                             highlightSampleStat(statValue); // Add highlight marker
 
-                             // Draw final histogram state then highlight
-                             drawSampleHistogram();
-                             highlightSampleStat(statValue);
-
-                             // Update sampling distribution
+                             // Update sampling distribution plot
                              if (statValue !== undefined && !isNaN(statValue)) {
                                  samplingDistributionData.push(statValue);
                                  const binIndex = Math.max(0, Math.min(NUM_SAMPLING_DIST_BINS - 1,
@@ -752,26 +873,25 @@
                                  numSamplesDrawn++;
                                  updateSamplingDistribution();
                              }
-                             setControlsDisabled(false); // Re-enable
-                             return; // End loop
+                             setControlsDisabled(false); // Re-enable controls
+                             return; // End animation loop
                          }
 
-                         // Draw one value
+                         // Draw next value in animation
                          const value = drawOneValue(populationCDF);
                          if (value !== null) {
-                              const rHighlight = Math.random();
+                              const rHighlight = Math.random(); // For finding approx source bin
                               const sourceBinIndex = populationCDF.findIndex(prob => prob >= rHighlight);
-                              // Pass appropriate delays
                               animateSingleDraw(value, sourceBinIndex >= 0 ? sourceBinIndex : 0, highlightClearDelay);
                               samplesDrawnThisRun++;
-                              setTimeout(drawNext, currentAnimDelay); // Use dynamic delay
+                              setTimeout(drawNext, currentAnimDelay); // Schedule next step
                          } else {
-                             console.error("Error drawing sample value (null). Stopping.");
+                             console.error("Error drawing sample value (null). Stopping animation.");
                              setControlsDisabled(false);
-                             updateSampleStatsDisplay(calculateSampleStats(currentSampleData)); // Update with partial data if any
+                             updateSampleStatsDisplay(calculateSampleStats(currentSampleData)); // Update with any partial data
                          }
                      } // end drawNext
-                     drawNext(); // Start the loop
+                     drawNext(); // Start animation loop
                  } catch (e) {
                      console.error("Error in runSamplingAnimation:", e);
                      setControlsDisabled(false); // Ensure controls enabled on error
@@ -781,36 +901,27 @@
              function runBulkSampling(numSamplesToDraw) {
                  console.log(`runBulkSampling called for ${numSamplesToDraw} samples.`);
                  try {
-                     if (isProcessing) { return; }
+                     if (isProcessing) return;
                      if (currentSampleSize !== lastSampleSizeForSamplingDist) {
-                         console.log(`Sample size changed (${lastSampleSizeForSamplingDist} -> ${currentSampleSize}), resetting sampling distribution.`);
+                         console.log(`Sample size changed, resetting sampling distribution.`);
                          clearSamplingDistribution();
                          lastSampleSizeForSamplingDist = currentSampleSize;
                      }
-
                      const populationCDF = getPopulationCDF();
-                     if (!populationCDF) {
-                         alert("Cannot draw samples: Population is empty."); return;
-                     }
+                     if (!populationCDF) { alert("Cannot draw samples: Population is empty."); return; }
 
                      setControlsDisabled(true);
-
-                     // Bulk calculations loop
+                     // Bulk Calculation Loop
                      for (let i = 0; i < numSamplesToDraw; i++) {
                          let singleSample = [];
                          for (let j = 0; j < currentSampleSize; j++) {
                              const value = drawOneValue(populationCDF);
-                             if (value !== null) {
-                                 singleSample.push(value);
-                             } else {
-                                 console.warn(`Error drawing value in bulk sample ${i+1}, item ${j+1}`);
-                             }
+                             if (value !== null) singleSample.push(value);
+                             else console.warn(`Error drawing value in bulk sample ${i+1}, item ${j+1}`);
                          }
-
                          if (singleSample.length > 0) {
                              const sampleStats = calculateSampleStats(singleSample);
                              const statValue = sampleStats[selectedSamplingStat];
-
                              if (statValue !== undefined && !isNaN(statValue)) {
                                  samplingDistributionData.push(statValue);
                                  const binIndex = Math.max(0, Math.min(NUM_SAMPLING_DIST_BINS - 1,
@@ -819,20 +930,14 @@
                                      samplingDistributionBins[binIndex]++;
                                  }
                                  numSamplesDrawn++;
-                             } else {
-                                 console.warn(`Invalid stat value for bulk sample ${i+1}:`, statValue);
-                             }
-                         } else {
-                             console.warn(`Empty sample generated in bulk run ${i+1}`);
-                         }
-                     } // End bulk loop
+                             } else { console.warn(`Invalid stat value for bulk sample ${i+1}:`, statValue); }
+                         } else { console.warn(`Empty sample generated in bulk run ${i+1}`); }
+                     } // End Bulk Loop
 
                      console.log(`Finished drawing ${numSamplesToDraw} samples.`);
                      updateSamplingDistribution(); // Update the third plot ONCE
-                     clearSample(); // Clear the middle plot
-
-                     setControlsDisabled(false);
-
+                     clearSample(); // Clear the middle plot display
+                     setControlsDisabled(false); // Re-enable controls
                  } catch (e) {
                      console.error("Error in runBulkSampling:", e);
                      setControlsDisabled(false);
@@ -845,105 +950,99 @@
             function resetSimulation() {
                 console.log("Resetting Simulation...");
                 try {
-                    // Reset state
-                    currentSampleSize = 5;
-                    selectedSamplingStat = 'mean';
-                    isProcessing = false;
-
-                    // Reset radio buttons
+                    currentSampleSize = 5; selectedSamplingStat = 'mean'; isProcessing = false;
+                    showNormalCurveCheckbox.checked = false;
                     document.getElementById('presetNormal').checked = true;
                     document.getElementById('n5').checked = true;
                     document.getElementById('statMean').checked = true;
-
-                    // Update displays tied to state
                     nValDisplay.textContent = currentSampleSize;
-
-                    // Load default population (also clears sample/sampling dist)
-                    loadPreset('normal');
-
-                    // Ensure controls are enabled
+                    samplingDistStatNameSpan.textContent = 'Mean'; // Reset title span
+                    loadPreset('normal'); // Clears plots too
                     setControlsDisabled(false);
-
                     console.log("Simulation Reset Complete.");
-                 } catch(e) {
-                     console.error("Error during reset:", e);
-                     setControlsDisabled(false); // Attempt recovery
-                 }
+                 } catch(e) { console.error("Error during reset:", e); setControlsDisabled(false); }
             }
 
             // ==================================================================
             // --- Event Listeners ---
             // ==================================================================
              try {
-                 // Sample Size Change
+                 // Sample Size Change Listener
                  sampleControlsDiv.addEventListener('change', (e) => {
                      if (e.target.type === 'radio' && e.target.name === 'sampleSize') {
                          const newSize = parseInt(e.target.value, 10);
                          currentSampleSize = newSize;
                          nValDisplay.textContent = currentSampleSize;
-                         // Reset sampling dist only if size actually changed AND samples had been drawn for previous size
                          if (newSize !== lastSampleSizeForSamplingDist && numSamplesDrawn > 0) {
-                             console.log("Sample size changed via radio, resetting sampling distribution.");
                              clearSamplingDistribution();
                          }
                      }
                  });
-                 // Statistic Change
+                 // Statistic Change Listener
                  samplingDistControlsDiv.addEventListener('change', (e) => {
                      if (e.target.type === 'radio' && e.target.name === 'samplingStat') {
                          selectedSamplingStat = e.target.value;
-                         console.log("Selected statistic changed to:", selectedSamplingStat, "- resetting distribution.");
+                         let statName = selectedSamplingStat.charAt(0).toUpperCase() + selectedSamplingStat.slice(1);
+                         if (statName === 'StdDev') statName = 'Std Dev';
+                         samplingDistStatNameSpan.textContent = statName; // Update title
                          clearSamplingDistribution();
-                         // Redraw sample plot to remove highlight specific to old statistic
-                         drawSampleHistogram();
+                         drawSampleHistogram(); // Redraw sample to clear highlight
                      }
                  });
-                 // Preset Change
-                 presetControlsDiv.addEventListener('change', (e) => {
-                     if (e.target.type === 'radio' && e.target.name === 'distType') {
-                         if (isProcessing) e.target.checked = false; // Prevent change during processing
+                 // Preset Change Listener
+                 presetControlsDiv.addEventListener('change',(e) => {
+                     if(e.target.type==='radio' && e.target.name==='distType'){
+                         if(isProcessing) e.target.checked = false; // Prevent change during processing
                          else loadPreset(e.target.value);
                      }
                  });
-                 // Population Drawing
-                 popCanvas.addEventListener('mousedown', (e) => {
-                     if (isProcessing) return;
+                 // Population Drawing Mouse Events
+                 popCanvas.addEventListener('mousedown',(e) => {
+                     if(isProcessing) return;
                      isDraggingPop = true;
                      popCanvas.style.cursor = 'grabbing';
                      applyPopulationDrawing(e);
-                     // Deselect preset radio
                      const checkedRadio = presetControlsDiv.querySelector('input[name="distType"]:checked');
-                     if (checkedRadio) checkedRadio.checked = false;
+                     if(checkedRadio) checkedRadio.checked = false; // Deselect preset
                  });
-                 popCanvas.addEventListener('mousemove', (e) => {
-                     if (isDraggingPop && !isProcessing) applyPopulationDrawing(e);
+                 popCanvas.addEventListener('mousemove',(e) => {
+                     if(isDraggingPop && !isProcessing) applyPopulationDrawing(e);
                  });
-                 document.addEventListener('mouseup', (e) => {
-                     if (isDraggingPop) {
+                 document.addEventListener('mouseup',(e) => {
+                     if(isDraggingPop){
                          isDraggingPop = false;
-                         if (!isProcessing) popCanvas.style.cursor = 'crosshair';
+                         if(!isProcessing) popCanvas.style.cursor = 'crosshair';
                      }
                  }, true); // Capture phase
-                 popCanvas.addEventListener('mouseleave', () => {
-                     if (!isDraggingPop && !isProcessing) popCanvas.style.cursor = 'crosshair';
+                 popCanvas.addEventListener('mouseleave',() => {
+                     if(!isDraggingPop && !isProcessing) popCanvas.style.cursor = 'crosshair';
                  });
-                 popCanvas.addEventListener('mouseenter', (e) => {
-                     if (!isProcessing) {
-                         // Correct dragging state if mouse button released outside
+                 popCanvas.addEventListener('mouseenter',(e) => {
+                     if(!isProcessing) {
+                         // Correct dragging state if mouseup happened outside
                          if (e.buttons !== 1 && isDraggingPop) isDraggingPop = false;
                          popCanvas.style.cursor = isDraggingPop ? 'grabbing' : 'crosshair';
                      }
                  });
 
-                 // Add Listener for Reset Button
+                 // Checkbox Listener
+                 if (showNormalCurveCheckbox) {
+                     showNormalCurveCheckbox.addEventListener('change', () => {
+                         drawSamplingDistributionHistogram(); // Redraw immediately
+                     });
+                 } else { console.error("Show Normal Curve checkbox not found!");}
+
+                 // Reset Button Listener
                  if (resetBtn) { resetBtn.addEventListener('click', resetSimulation); }
                  else { console.error("Reset Button not found!"); }
 
-                 // Other Button Listeners
+                 // Draw Button Listeners
                  if (drawSampleBtn) { drawSampleBtn.addEventListener('click', runSamplingAnimation); }
                  else { console.error("Draw 1 Sample button not found."); }
                  if (draw100SamplesBtn) { draw100SamplesBtn.addEventListener('click', () => runBulkSampling(100)); }
                  else { console.error("Draw 100 Samples button not found."); }
+                 if (draw1000SamplesBtn) { draw1000SamplesBtn.addEventListener('click', () => runBulkSampling(1000)); }
+                 else { console.error("Draw 1000 Samples button not found."); }
 
              } catch (e) { console.error("Error setting up event listeners:", e); }
 
