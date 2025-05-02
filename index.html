@@ -37,10 +37,10 @@
             </div>
         </section>
         <section class="simulation-section sample-section">
-            <h3>Sample Distribution (n=<span id="nValDisplay">5</span>)</h3>
+            <h2>Sample Distribution (n=<span id="nValDisplay">5</span>)</h2>
             <p class="instructions">A single sample drawn from the population above. Highlight shows calculated statistic.</p>
             <div class="controls" id="sampleControls">
-                <div class="control-group">
+                <div class="controls">
                      <span>Sample Size (n):</span>
                      <input type="radio" id="n5" name="sampleSize" value="5" checked> <label for="n5">5</label>
                      <input type="radio" id="n10" name="sampleSize" value="10"> <label for="n10">10</label>
@@ -68,16 +68,16 @@
             </div>
         </section>
          <section class="simulation-section sampling-dist-section">
-             <h3>Sampling <span id="samplingDistStatName">Mean</span> Distribution</h3>
+             <h2>Sampling <span id="samplingDistStatName">Mean</span> Distribution</h2>
              <p class="instructions">Distribution of statistics calculated from multiple samples.</p>
             <div class="controls" id="samplingDistControls">
+                <div class="controls">
                  <span>Plot Statistic:</span>
-                 <span class="stat-select">
                      <input type="radio" id="statMean" name="samplingStat" value="mean" checked> <label for="statMean">Mean</label>
                      <input type="radio" id="statMedian" name="samplingStat" value="median"> <label for="statMedian">Median</label>
-                     <input type="radio" id="statStdDev" name="samplingStat" value="stdDev"> <label for="statStdDev">Std Dev</label>
-                 </span>
+
                  <label class="checkbox-label"><input type="checkbox" id="showNormalCurve"> Show Normal Curve</label>
+                 </div>
             </div>
             <div class="content-area">
                 <div class="canvas-container">
@@ -95,8 +95,8 @@
         </section>
     </div>
 
-   
-    <script src="clt.js"></script>
+    <script src="clt.js">
+     </script>
 
 </body>
 </html>
