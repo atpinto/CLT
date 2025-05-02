@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLT Simulation - Formatted</title>
+    <link rel="stylesheet" href="clt.css">
+</head>
+<body>
+    <!-- HTML Content -->
+    <h1>Central Limit Theorem Simulation</h1>
+     <div class="reset-container">
+        <button id="resetBtn" class="reset-button">Reset Simulation</button>
+    </div>
+    <div class="main-container">
+        <section class="simulation-section population-section">
+            <h2>Population</h2>
+            <p class="instructions">Define population shape via presets or by clicking/dragging on the plot.</p>
+            <div class="controls" id="presetControls">
+                 <span>Population Distribution:</span>
+                 <input type="radio" id="presetNormal" name="distType" value="normal" checked> <label for="presetNormal">Normal</label>
+                 <input type="radio" id="presetUniform" name="distType" value="uniform"> <label for="presetUniform">Uniform</label>
+                 <input type="radio" id="presetExponential" name="distType" value="exponential"> <label for="presetExponential">Exponential</label>
+                 <input type="radio" id="presetBimodal" name="distType" value="bimodal"> <label for="presetBimodal">Bimodal</label>
+            </div>
+            <div class="content-area" id="population-area">
+                <div class="canvas-container" id="population-canvas-container">
+                    <!-- Adjusted canvas size slightly if needed, but mainly CSS -->
+                    <canvas id="populationCanvas" class="population-canvas" width="250" height="145"></canvas>
+                </div>
+                <div id="populationStatsDisplay" class="stats-display">
+                    <h2>Population Stats</h2>
+                    <p>Mean: <span id="popMeanVal">-</span></p>
+                    <p>Median: <span id="popMedianVal">-</span></p>
+                    <p>Std Dev: <span id="popStdDevVal">-</span></p>
+                </div>
+            </div>
+        </section>
+        <section class="simulation-section sample-section">
+            <h3>Sample Distribution (n=<span id="nValDisplay">5</span>)</h3>
+            <p class="instructions">A single sample drawn from the population above. Highlight shows calculated statistic.</p>
+            <div class="controls" id="sampleControls">
+                <div class="control-group">
+                     <span>Sample Size (n):</span>
+                     <input type="radio" id="n5" name="sampleSize" value="5" checked> <label for="n5">5</label>
+                     <input type="radio" id="n10" name="sampleSize" value="10"> <label for="n10">10</label>
+                     <input type="radio" id="n20" name="sampleSize" value="20"> <label for="n20">20</label>
+                     <input type="radio" id="n100" name="sampleSize" value="100"> <label for="n100">100</label>
+                </div>
+                <div class="button-group">
+                     <button id="drawSampleBtn">Draw 1 Sample</button>
+                     <button id="draw100SamplesBtn">Draw 100 Samples</button>
+                     <button id="draw1000SamplesBtn">Draw 1000 Samples</button>
+                 </div>
+            </div>
+            <div class="content-area">
+                 <div class="canvas-container">
+                    <!-- Adjusted canvas size slightly if needed, but mainly CSS -->
+                    <canvas id="sampleCanvas" class="sample-canvas" width="250" height="145"></canvas>
+                </div>
+                <div id="sampleStatsDisplay" class="stats-display">
+                    <h2>Sample Stats</h2>
+                    <p>Mean: <span id="sampleMeanVal">-</span></p>
+                    <p>Median: <span id="sampleMedianVal">-</span></p>
+                    <p>Std Dev: <span id="sampleStdDevVal">-</span></p>
+                    <p>Size (n): <span id="sampleNVal">-</span></p>
+                </div>
+            </div>
+        </section>
+         <section class="simulation-section sampling-dist-section">
+             <h3>Sampling <span id="samplingDistStatName">Mean</span> Distribution</h3>
+             <p class="instructions">Distribution of statistics calculated from multiple samples.</p>
+            <div class="controls" id="samplingDistControls">
+                 <span>Plot Statistic:</span>
+                 <span class="stat-select">
+                     <input type="radio" id="statMean" name="samplingStat" value="mean" checked> <label for="statMean">Mean</label>
+                     <input type="radio" id="statMedian" name="samplingStat" value="median"> <label for="statMedian">Median</label>
+                     <input type="radio" id="statStdDev" name="samplingStat" value="stdDev"> <label for="statStdDev">Std Dev</label>
+                 </span>
+                 <label class="checkbox-label"><input type="checkbox" id="showNormalCurve"> Show Normal Curve</label>
+            </div>
+            <div class="content-area">
+                <div class="canvas-container">
+                     <!-- Adjusted canvas size slightly if needed, but mainly CSS -->
+                    <canvas id="samplingDistCanvas" class="sampling-dist-canvas" width="250" height="145"></canvas>
+                </div>
+                <div id="samplingDistStatsDisplay" class="stats-display">
+                    <h2>Distribution Stats</h2>
+                    <p>Samples Drawn: <span id="samplesDrawnVal" class="count">0</span></p>
+                    <p>Mean: <span id="samplingMeanVal">-</span></p>
+                    <p>Median: <span id="samplingMedianVal">-</span></p>
+                    <p>Std Error: <span id="samplingStdDevVal">-</span></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+   
+    <script src="clt.js"></script>
+
+</body>
+</html>
