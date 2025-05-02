@@ -9,8 +9,8 @@
   --light-bg: #f8f9fa;
   --dark-text: #343a40;
   --medium-text: #6c757d;
-  --border-color: #dee2e6;
-  --canvas-bg: #ffffff;
+  --border-color: #E8E9E8;
+  --canvas-bg: #E8E9E8;
   --pop-line-color: var(--primary-color);
   --pop-fill-color: rgba(0, 123, 255, 0.15);
   --sample-bar-fill: var(--success-color);
@@ -110,9 +110,9 @@ h3 {
 }
 
 .controls {
-  background-color: #ffffff;
+  background-color:#fff6f6;
   padding: 3px 6px;
-  border-radius: 3px;
+  border-radius: 10px;
   border: 1px solid #dee2e6;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
   text-align: left;
@@ -231,7 +231,7 @@ h3 {
 .stats-display {
   border: 1px solid var(--border-color);
   padding: 4px 8px;
-  background-color: #fdfdfd;
+  background-color: var(--canvas-bg);
   border-radius: 4px;
   width: 130px;
   min-width: 115px;
