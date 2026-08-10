@@ -1,129 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Central Limit Theorem — simulation</title>
-<link rel="stylesheet" href="clt.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLT Simulation - Formatted</title>
+    <link rel="stylesheet" href="clt.css">
 </head>
 <body>
-
-<div class="shell">
-
-  <header class="masthead">
-    <div class="masthead__text">
-      <h1>Central Limit Theorem</h1>
-      <p class="tagline">Shape a population, watch observations fall into a sample, and see the statistic from every sample pile up on the right.</p>
+    <!-- HTML Content -->
+    <h1>Central Limit Theorem Simulation</h1>
+     <div class="reset-container">
+        <button id="resetBtn" class="reset-button">Reset Simulation</button>
     </div>
-    <button id="resetBtn" class="btn btn--ghost" type="button">Reset</button>
-  </header>
-
-  <div class="workbench" id="workbench">
-
-    <!-- Particles travel across this layer, above the cards -->
-    <canvas id="flightLayer" class="flight-layer" aria-hidden="true"></canvas>
-
-    <!-- Left column: the draw -->
-    <div class="column">
-
-      <section class="stage stage--population">
-        <div class="stage__head">
-          <span class="stage__step">01</span>
-          <h2>Population</h2>
-        </div>
-        <p class="instructions">Pick a shape, or drag on the plot to draw your own.</p>
-
-        <div class="control-row" id="presetControls">
-          <div class="chips">
-            <input type="radio" id="presetNormal" name="distType" value="normal" checked><label for="presetNormal">Normal</label>
-            <input type="radio" id="presetUniform" name="distType" value="uniform"><label for="presetUniform">Uniform</label>
-            <input type="radio" id="presetExponential" name="distType" value="exponential"><label for="presetExponential">Exponential</label>
-            <input type="radio" id="presetBimodal" name="distType" value="bimodal"><label for="presetBimodal">Bimodal</label>
-          </div>
-        </div>
-
-        <canvas id="populationCanvas" class="population-canvas" aria-label="Population distribution"></canvas>
-
-        <dl class="statbar statbar--population">
-          <div class="stat"><dt>Mean</dt><dd id="popMeanVal">-</dd></div>
-          <div class="stat"><dt>Median</dt><dd id="popMedianVal">-</dd></div>
-          <div class="stat"><dt>SD</dt><dd id="popStdDevVal">-</dd></div>
-        </dl>
-      </section>
-
-      <div class="connector" aria-hidden="true">
-        <span class="connector__line"></span>
-        <span class="connector__label">draws</span>
-        <span class="connector__line"></span>
-      </div>
-
-      <section class="stage stage--sample">
-        <div class="stage__head">
-          <span class="stage__step">02</span>
-          <h2>One sample</h2>
-          <span class="stage__meta">n = <span id="nValDisplay">5</span></span>
-        </div>
-        <p class="instructions">Each dot is one observation that fell out of the population above.</p>
-
-        <div id="sampleControls">
-          <div class="control-row">
-            <span class="control-label">Size</span>
-            <div class="chips">
-              <input type="radio" id="n5" name="sampleSize" value="5" checked><label for="n5">5</label>
-              <input type="radio" id="n10" name="sampleSize" value="10"><label for="n10">10</label>
-              <input type="radio" id="n20" name="sampleSize" value="20"><label for="n20">20</label>
-              <input type="radio" id="n100" name="sampleSize" value="100"><label for="n100">100</label>
+    <div class="main-container">
+        <section class="simulation-section population-section">
+            <h2>Population</h2>
+            <p class="instructions">Define population shape via presets or by clicking/dragging on the plot.</p>
+            <div class="controls" id="presetControls">
+                 <span>Population Distribution:</span>
+                 <input type="radio" id="presetNormal" name="distType" value="normal" checked> <label for="presetNormal">Normal</label>
+                 <input type="radio" id="presetUniform" name="distType" value="uniform"> <label for="presetUniform">Uniform</label>
+                 <input type="radio" id="presetExponential" name="distType" value="exponential"> <label for="presetExponential">Exponential</label>
+                 <input type="radio" id="presetBimodal" name="distType" value="bimodal"> <label for="presetBimodal">Bimodal</label>
             </div>
-          </div>
-          <div class="button-group">
-            <button id="drawSampleBtn" class="btn btn--primary" type="button">Draw 1 sample</button>
-            <button id="draw100SamplesBtn" class="btn btn--secondary" type="button">Draw 100</button>
-            <button id="draw1000SamplesBtn" class="btn btn--secondary" type="button">Draw 1,000</button>
-          </div>
-        </div>
+            <div class="content-area" id="population-area">
+                <div class="canvas-container" id="population-canvas-container">
+                    <!-- Adjusted canvas size slightly if needed, but mainly CSS -->
+                    <canvas id="populationCanvas" class="population-canvas" width="250" height="145"></canvas>
+                </div>
+                <div id="populationStatsDisplay" class="stats-display">
+                    <h2>Population Stats</h2>
+                    <p>Mean: <span id="popMeanVal">-</span></p>
+                    <p>Median: <span id="popMedianVal">-</span></p>
+                    <p>Std Dev: <span id="popStdDevVal">-</span></p>
+                </div>
+            </div>
+        </section>
+        <section class="simulation-section sample-section">
+            <h2>Sample Distribution (n=<span id="nValDisplay">5</span>)</h2>
+            <p class="instructions">A single sample drawn from the population above. Highlight shows calculated statistic.</p>
+            <div class="controls" id="sampleControls">
+                <div class="controls">
+                     <span>Sample Size (n):</span>
+                     <input type="radio" id="n5" name="sampleSize" value="5" checked> <label for="n5">5</label>
+                     <input type="radio" id="n10" name="sampleSize" value="10"> <label for="n10">10</label>
+                     <input type="radio" id="n20" name="sampleSize" value="20"> <label for="n20">20</label>
+                     <input type="radio" id="n100" name="sampleSize" value="100"> <label for="n100">100</label>
+                </div>
+                <div class="button-group">
+                     <button id="drawSampleBtn">Draw 1 Sample</button>
+                     <button id="draw100SamplesBtn">Draw 100 Samples</button>
+                     <button id="draw1000SamplesBtn">Draw 1000 Samples</button>
+                 </div>
+            </div>
+            <div class="content-area">
+                 <div class="canvas-container">
+                    <!-- Adjusted canvas size slightly if needed, but mainly CSS -->
+                    <canvas id="sampleCanvas" class="sample-canvas" width="250" height="145"></canvas>
+                </div>
+                <div id="sampleStatsDisplay" class="stats-display">
+                    <h2>Sample Stats</h2>
+                    <p>Mean: <span id="sampleMeanVal">-</span></p>
+                    <p>Median: <span id="sampleMedianVal">-</span></p>
+                    <p>Std Dev: <span id="sampleStdDevVal">-</span></p>
+                    <p>Size (n): <span id="sampleNVal">-</span></p>
+                </div>
+            </div>
+        </section>
+         <section class="simulation-section sampling-dist-section">
+             <h2>Sampling <span id="samplingDistStatName">Mean</span> Distribution</h2>
+             <p class="instructions">Distribution of statistics calculated from multiple samples.</p>
+            <div class="controls" id="samplingDistControls">
+                <div class="controls">
+                 <span>Plot Statistic:</span>
+                     <input type="radio" id="statMean" name="samplingStat" value="mean" checked> <label for="statMean">Mean</label>
+                     <input type="radio" id="statMedian" name="samplingStat" value="median"> <label for="statMedian">Median</label>
 
-        <canvas id="sampleCanvas" class="sample-canvas" aria-label="Observations in the current sample"></canvas>
-
-        <dl class="statbar statbar--sample">
-          <div class="stat"><dt>Mean</dt><dd id="sampleMeanVal">-</dd></div>
-          <div class="stat"><dt>Median</dt><dd id="sampleMedianVal">-</dd></div>
-          <div class="stat"><dt>SD</dt><dd id="sampleStdDevVal">-</dd></div>
-          <div class="stat"><dt>n</dt><dd id="sampleNVal">-</dd></div>
-        </dl>
-      </section>
+                 <label class="checkbox-label"><input type="checkbox" id="showNormalCurve"> Show Normal Curve</label>
+                 </div>
+            </div>
+            <div class="content-area">
+                <div class="canvas-container">
+                     <!-- Adjusted canvas size slightly if needed, but mainly CSS -->
+                    <canvas id="samplingDistCanvas" class="sampling-dist-canvas" width="250" height="145"></canvas>
+                </div>
+                <div id="samplingDistStatsDisplay" class="stats-display">
+                    <h2>Distribution Stats</h2>
+                    <p>Samples Drawn: <span id="samplesDrawnVal" class="count">0</span></p>
+                    <p>Mean: <span id="samplingMeanVal">-</span></p>
+                    <p>Median: <span id="samplingMedianVal">-</span></p>
+                    <p>Std Error: <span id="samplingStdDevVal">-</span></p>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- Right column: the result -->
-    <div class="column">
-      <section class="stage stage--sampling">
-        <div class="stage__head">
-          <span class="stage__step">03</span>
-          <h2>Sampling distribution of the <span id="samplingDistStatName">Mean</span></h2>
-        </div>
-        <p class="instructions">One bar per sample: the statistic carried over from step 02, for every sample drawn so far.</p>
+    <script src="clt.js">
+     </script>
 
-        <div class="control-row" id="samplingDistControls">
-          <div class="chips">
-            <input type="radio" id="statMean" name="samplingStat" value="mean" checked><label for="statMean">Mean</label>
-            <input type="radio" id="statMedian" name="samplingStat" value="median"><label for="statMedian">Median</label>
-          </div>
-          <label class="toggle"><input type="checkbox" id="showNormalCurve"> Normal curve</label>
-        </div>
-
-        <canvas id="samplingDistCanvas" class="sampling-dist-canvas" aria-label="Distribution of the sample statistic"></canvas>
-
-        <dl class="statbar statbar--sampling">
-          <div class="stat"><dt>Samples</dt><dd id="samplesDrawnVal" class="count">0</dd></div>
-          <div class="stat"><dt>Mean</dt><dd id="samplingMeanVal">-</dd></div>
-          <div class="stat"><dt>Median</dt><dd id="samplingMedianVal">-</dd></div>
-          <div class="stat"><dt>SE</dt><dd id="samplingStdDevVal">-</dd></div>
-        </dl>
-      </section>
-    </div>
-
-  </div>
-</div>
-
-<script src="clt.js"></script>
 </body>
 </html>
